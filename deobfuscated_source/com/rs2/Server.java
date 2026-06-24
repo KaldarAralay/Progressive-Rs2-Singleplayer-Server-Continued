@@ -30,6 +30,7 @@ import com.rs2.model.c.ProjectileDefinition;
 import com.rs2.model.clue.TreasureTrailManager;
 import com.rs2.model.combat.CombatManager;
 import com.rs2.model.gameplay.duel.DuelSession;
+import com.rs2.model.gameplay.dwarfcannon.DwarfCannonManager;
 import com.rs2.model.gameplay.godwars.GodWarsDungeonManager;
 import com.rs2.model.gameplay.magetrainingarena.AlchemistPlaygroundController;
 import com.rs2.model.gameplay.magetrainingarena.CreatureGraveyardController;
@@ -661,6 +662,10 @@ implements Runnable {
                         if (disconnectingPlayer.isInArea(1790, 2045, 4800, 4915)) {
                             disconnectingPlayer.moveTo(new Position(3053, 3246, 0));
                         }
+                        cleanupTimer = ProfilerRegistry.getTimer("dwarfCannonLogout");
+                        cleanupTimer.start();
+                        DwarfCannonManager.handleLogout(disconnectingPlayer);
+                        cleanupTimer.stop();
                         CharacterFileManager.savePlayer(disconnectingPlayer);
                         CharacterFileManager.refreshLiveHiscoreRecord(disconnectingPlayer);
                         if (ServerSettings.mysqlHiscoresEnabled) {
