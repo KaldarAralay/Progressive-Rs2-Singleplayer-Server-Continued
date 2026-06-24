@@ -50,6 +50,7 @@ import com.rs2.model.player.Player;
 import com.rs2.model.player.PlayerConnectionState;
 import com.rs2.model.quest.QuestDefinition;
 import com.rs2.model.quest.QuestEventRegistry;
+import com.rs2.model.quest.impl.DwarfCannonQuest;
 import com.rs2.model.quest.impl.WaterfallQuest;
 import com.rs2.model.shop.ShopManager;
 import com.rs2.model.skill.fishing.FishingSpotManager;
@@ -329,6 +330,7 @@ implements Runnable {
             PartyRoomManager.loadPartyChest();
             NpcDropTable.loadDropTables();
             GameplayHelper.loadNpcSpawns();
+            DwarfCannonQuest.spawnMissingContent();
             WaterfallQuest.spawnMissingNpcs();
             TreasureTrailManager.filterRewardItemPools();
             BotCombatLoadoutManager.initializeCombatLoadoutTypes();

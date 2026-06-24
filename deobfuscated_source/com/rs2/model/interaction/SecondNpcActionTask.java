@@ -12,6 +12,7 @@ import com.rs2.model.npc.Npc;
 import com.rs2.model.player.BankManager;
 import com.rs2.model.player.GrandExchangeManager;
 import com.rs2.model.player.Player;
+import com.rs2.model.quest.impl.DwarfCannonQuest;
 import com.rs2.model.skill.runecrafting.RunecraftingHandler;
 import com.rs2.model.task.TickTask;
 import com.rs2.util.GameUtil;
@@ -87,6 +88,10 @@ extends TickTask {
         }
         this.npc.getUpdateState().setFaceEntity(this.player.getEncodedIndex());
         this.player.setInteractionTarget(this.npc);
+        if (this.npc.getNpcId() == 209 && DwarfCannonQuest.handleNulodionTrade(this.player)) {
+            this.stop();
+            return;
+        }
         if (GameplayHelper.openNpcShop(this.player, this.npc.getNpcId())) {
             this.stop();
             return;

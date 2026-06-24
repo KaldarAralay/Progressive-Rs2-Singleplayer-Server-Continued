@@ -1245,17 +1245,17 @@ public final class PacketSender {
         if (this.player.isBot) {
             return this;
         }
-        LoadedWorldObject loadedWorldObject = WorldObjectLookup.findObjectAt(n, n2, n3);
         int objectType;
         int objectOrientation;
-        if (loadedWorldObject == null) {
-            DynamicObject dynamicObject = ObjectManager.findDynamicObjectAt(n, n2, n3);
-            if (dynamicObject == null) {
-                return this;
-            }
+        DynamicObject dynamicObject = ObjectManager.findDynamicObjectAt(n, n2, n3);
+        if (dynamicObject != null) {
             objectType = dynamicObject.getWorldObject().getType();
             objectOrientation = dynamicObject.orientation;
         } else {
+            LoadedWorldObject loadedWorldObject = WorldObjectLookup.findObjectAt(n, n2, n3);
+            if (loadedWorldObject == null) {
+                return this;
+            }
             objectType = loadedWorldObject.getType();
             objectOrientation = loadedWorldObject.getOrientation();
         }

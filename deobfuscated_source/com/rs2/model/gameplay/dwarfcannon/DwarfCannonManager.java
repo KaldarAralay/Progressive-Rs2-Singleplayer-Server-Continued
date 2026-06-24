@@ -40,6 +40,8 @@ public final class DwarfCannonManager {
     public static final int BASE_OBJECT = 7;
     public static final int STAND_OBJECT = 8;
     public static final int BARRELS_OBJECT = 9;
+    private static final int DWARF_CANNON_QUEST_ID = 30;
+    private static final int CANNON_OBJECT_TYPE = 10;
     private static final int STAGE_NONE = 0;
     private static final int STAGE_BASE = 1;
     private static final int STAGE_STAND = 2;
@@ -48,10 +50,12 @@ public final class DwarfCannonManager {
     private static final int DECAY_TICKS = 2500;
     private static final int MAX_AMMO = 30;
     private static final int[] TURN_ANIMATIONS = new int[]{515, 516, 517, 518, 519, 520, 521, 514};
+    private static final int[] TURN_ORIENTATIONS = new int[]{0, 0, 1, 1, 2, 2, 3, 3};
     private static final AttackStyleDefinition CANNON_ATTACK_STYLE = new AttackStyleDefinition(CombatType.RANGED, AttackXpMode.RANGED_ACCURATE, AttackBonusType.RANGED);
     private static final ProjectileDefinition CANNONBALL_PROJECTILE = new ProjectileDefinition(53, ProjectileTiming.a.copy().setStartDelay(0).setSpeed(5));
     private static final Map cannonsByOwner = new HashMap();
     private static final Map cannonsByCoord = new HashMap();
+    private static final Map lostCannonsByOwner = new HashMap();
     private static final int[][] DIRECTION_TARGETS = new int[][]{
         {0, 3, 0, 7, 0, 14},
         {2, 2, 5, 5, 12, 12},
@@ -142,6 +146,11 @@ public final class DwarfCannonManager {
     }
 
     private static void setupBase(Player player) {
+        if (player.getQuestState(DWARF_CANNON_QUEST_ID) != 1) {
+            player.packetSender.sendGameMessage("You can't set up this cannon.");
+            player.packetSender.sendGameMessage("You need to complete the Dwarf Cannon quest.");
+            return;
+        }
         CannonState existingState = getStateForOwner(player);
         if (existingState != null) {
             player.packetSender.sendGameMessage("You cannot construct more than one Cannon at a time.");
@@ -238,6 +247,7 @@ public final class DwarfCannonManager {
         }
         sendPickupMessages(player);
         removeState(state, true);
+        lostCannonsByOwner.remove(state.ownerKey);
         int index = 0;
         while (index < items.length) {
             player.getInventoryManager().addItem(new ItemStack(items[index], 1));
@@ -257,6 +267,7 @@ public final class DwarfCannonManager {
         sendPickupMessages(player);
         int ammo = state.ammo;
         removeState(state, true);
+        lostCannonsByOwner.remove(state.ownerKey);
         player.getInventoryManager().addItem(new ItemStack(BASE_ITEM, 1));
         player.getInventoryManager().addItem(new ItemStack(STAND_ITEM, 1));
         player.getInventoryManager().addItem(new ItemStack(BARRELS_ITEM, 1));
@@ -322,13 +333,13 @@ public final class DwarfCannonManager {
 
     private static void placeCannonObject(CannonState state, int objectId) {
         ObjectManager.getInstance().removeDynamicObjectAt(state.x, state.y, state.plane, 10);
-        new DynamicObject(objectId, state.x, state.y, state.plane, 0, 10, ServerSettings.placeholderObjectId, DECAY_TICKS, false);
+        new DynamicObject(objectId, state.x, state.y, state.plane, 0, CANNON_OBJECT_TYPE, ServerSettings.placeholderObjectId, DECAY_TICKS, false);
     }
 
     private static CannonState getStateForOwner(Player player) {
         CannonState state = (CannonState)cannonsByOwner.get(ownerKey(player));
         if (state != null && !objectStillExists(state)) {
-            removeState(state, false);
+            removeState(state, false, true);
             return null;
         }
         return state;
@@ -337,7 +348,7 @@ public final class DwarfCannonManager {
     private static CannonState getStateForObject(int x, int y, int plane) {
         CannonState state = (CannonState)cannonsByCoord.get(coordKey(x, y, plane));
         if (state != null && !objectStillExists(state)) {
-            removeState(state, false);
+            removeState(state, false, true);
             return null;
         }
         return state;
@@ -354,6 +365,13 @@ public final class DwarfCannonManager {
     }
 
     private static void removeState(CannonState state, boolean removeObject) {
+        removeState(state, removeObject, false);
+    }
+
+    private static void removeState(CannonState state, boolean removeObject, boolean reclaimable) {
+        if (reclaimable && state.stage > STAGE_NONE) {
+            lostCannonsByOwner.put(state.ownerKey, new LostCannonState(state.stage));
+        }
         state.rotating = false;
         state.stage = STAGE_NONE;
         cannonsByOwner.remove(state.ownerKey);
@@ -366,6 +384,51 @@ public final class DwarfCannonManager {
     private static void scheduleDecay(CannonState state) {
         ++state.decaySerial;
         World.getTaskScheduler().schedule(new CannonDecayTask(state.ownerKey, state.decaySerial));
+    }
+
+    public static boolean hasActiveCannon(Player player) {
+        return getStateForOwner(player) != null;
+    }
+
+    public static boolean hasLostCannon(Player player) {
+        return lostCannonsByOwner.containsKey(ownerKey(player));
+    }
+
+    public static boolean reclaimLostCannon(Player player) {
+        if (hasActiveCannon(player)) {
+            return false;
+        }
+        String ownerKey = ownerKey(player);
+        LostCannonState lostState = (LostCannonState)lostCannonsByOwner.get(ownerKey);
+        if (lostState == null || lostState.stage <= STAGE_NONE) {
+            return false;
+        }
+        int[] items = getItemsForStage(lostState.stage);
+        if (items == null || player.getInventoryManager().getContainer().getFreeSlots() < items.length) {
+            player.packetSender.sendGameMessage("You don't have enough inventory space for the cannon parts.");
+            return false;
+        }
+        int index = 0;
+        while (index < items.length) {
+            player.getInventoryManager().addItem(new ItemStack(items[index], 1));
+            ++index;
+        }
+        lostCannonsByOwner.remove(ownerKey);
+        if (items.length == 1) {
+            player.packetSender.sendGameMessage("The dwarf gives you a new cannon part.");
+        } else if (items.length == 4) {
+            player.packetSender.sendGameMessage("The dwarf gives you a new cannon.");
+        } else {
+            player.packetSender.sendGameMessage("The dwarf gives you new cannon parts.");
+        }
+        return true;
+    }
+
+    public static void handleLogout(Player player) {
+        CannonState state = getStateForOwner(player);
+        if (state != null) {
+            removeState(state, true, true);
+        }
     }
 
     private static Npc findTarget(Player player, CannonState state, Position center) {
@@ -429,12 +492,12 @@ public final class DwarfCannonManager {
         if (npc.isInMultiCombatArea()) {
             return true;
         }
-        return isFreeForSingleCombat(player, npc) && isFreeForSingleCombat(npc, player);
+        return isFreeForSingleCombatPair(player, npc) && isFreeForSingleCombatPair(npc, player);
     }
 
-    private static boolean isFreeForSingleCombat(Entity attacker, Entity target) {
-        Entity currentTarget = attacker.getSingleCombatTimer().getTarget();
-        return currentTarget == null || attacker.getSingleCombatTimer().hasElapsed() || currentTarget == target;
+    private static boolean isFreeForSingleCombatPair(Entity entity, Entity target) {
+        Entity currentTarget = entity.getSingleCombatTimer().getTarget();
+        return currentTarget == null || entity.getSingleCombatTimer().hasElapsed() || currentTarget == target;
     }
 
     private static void shoot(Player player, CannonState state, Npc target) {
@@ -448,7 +511,13 @@ public final class DwarfCannonManager {
     }
 
     private static void animateTurn(CannonState state) {
-        int animationId = TURN_ANIMATIONS[state.direction % TURN_ANIMATIONS.length];
+        int direction = state.direction % TURN_ANIMATIONS.length;
+        int animationId = TURN_ANIMATIONS[direction];
+        int orientation = TURN_ORIENTATIONS[direction];
+        DynamicObject dynamicObject = ObjectManager.findDynamicObjectAt(state.x, state.y, state.plane);
+        if (dynamicObject != null) {
+            dynamicObject.orientation = orientation;
+        }
         Position center = state.center();
         Player[] players = World.getPlayers();
         int index = 0;
@@ -491,6 +560,22 @@ public final class DwarfCannonManager {
         }
         if (objectId == BARRELS_OBJECT) {
             return new int[]{BASE_ITEM, STAND_ITEM, BARRELS_ITEM};
+        }
+        return null;
+    }
+
+    private static int[] getItemsForStage(int stage) {
+        if (stage == STAGE_BASE) {
+            return new int[]{BASE_ITEM};
+        }
+        if (stage == STAGE_STAND) {
+            return new int[]{BASE_ITEM, STAND_ITEM};
+        }
+        if (stage == STAGE_BARRELS) {
+            return new int[]{BASE_ITEM, STAND_ITEM, BARRELS_ITEM};
+        }
+        if (stage == STAGE_FULL) {
+            return new int[]{BASE_ITEM, STAND_ITEM, BARRELS_ITEM, FURNACE_ITEM};
         }
         return null;
     }
@@ -554,6 +639,14 @@ public final class DwarfCannonManager {
         }
     }
 
+    private static final class LostCannonState {
+        private final int stage;
+
+        private LostCannonState(int stage) {
+            this.stage = stage;
+        }
+    }
+
     private static final class CannonDecayTask
     extends TickTask {
         private final String ownerKey;
@@ -573,7 +666,7 @@ public final class DwarfCannonManager {
                 if (player != null) {
                     player.packetSender.sendGameMessage("Your cannon has decayed.");
                 }
-                removeState(state, true);
+                removeState(state, true, true);
             }
             this.stop();
         }

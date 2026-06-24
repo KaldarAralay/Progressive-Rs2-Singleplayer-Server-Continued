@@ -13,6 +13,7 @@ import com.rs2.model.gameplay.magetrainingarena.MageTrainingArenaRewardShop;
 import com.rs2.model.npc.Npc;
 import com.rs2.model.player.Player;
 import com.rs2.model.quest.QuestDefinition;
+import com.rs2.model.quest.impl.DwarfCannonQuest;
 import com.rs2.model.shop.ShopManager;
 import com.rs2.model.skill.runecrafting.RunecraftingHandler;
 import com.rs2.model.task.TickTask;
@@ -50,6 +51,10 @@ extends TickTask {
         Object object = World.getNpcs()[this.player.getInteractionTargetIndex()];
         this.player.getUpdateState().setFaceEntity(((Entity)object).getEncodedIndex());
         ((Entity)object).getUpdateState().setFaceEntity(this.player.getEncodedIndex());
+        if (this.player.getInteractionTargetId() == 209 && DwarfCannonQuest.handleNulodionTrade(this.player)) {
+            this.stop();
+            return;
+        }
         switch (this.player.getInteractionTargetId()) {
             case 553: {
                 RunecraftingHandler.startAbyssMageTeleport(this.player, (Npc)object);
