@@ -17,6 +17,7 @@ import com.rs2.model.dialogue.DialogueManager;
 import com.rs2.model.gameplay.abyss.AbyssManager;
 import com.rs2.model.gameplay.barrows.BarrowsManager;
 import com.rs2.model.gameplay.duel.DuelHistory;
+import com.rs2.model.gameplay.dwarfcannon.DwarfCannonManager;
 import com.rs2.model.gameplay.godwars.GodWarsDungeonManager;
 import com.rs2.model.gameplay.partyroom.PartyRoomManager;
 import com.rs2.model.ground.GroundItemManager;
@@ -198,6 +199,10 @@ extends TickTask {
             return;
         }
         if (this.player.getQuestManager().handleFirstObjectAction(this.objectId, this.objectX, this.objectY)) {
+            this.stop();
+            return;
+        }
+        if (DwarfCannonManager.handleFirstObjectAction(this.player, this.objectId, this.objectX, this.objectY, this.objectPlane)) {
             this.stop();
             return;
         }

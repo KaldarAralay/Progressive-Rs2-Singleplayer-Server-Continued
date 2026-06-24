@@ -9,6 +9,7 @@ import com.rs2.model.GameplayHelper;
 import com.rs2.model.Position;
 import com.rs2.model.combat.AttackStyleDefinition;
 import com.rs2.model.dialogue.DialogueManager;
+import com.rs2.model.gameplay.dwarfcannon.DwarfCannonManager;
 import com.rs2.model.gameplay.godwars.GodWarsDungeonManager;
 import com.rs2.model.gameplay.partyroom.PartyRoomManager;
 import com.rs2.model.interaction.InteractionDispatcher;
@@ -75,6 +76,10 @@ extends TickTask {
             this.player.getUpdateState().setFacePosition(position.centerForSize(((ObjectDefinition)object).getMaxDimension()));
         }
         if (this.player.getQuestManager().handleSecondObjectAction(this.objectId, this.objectX, this.objectY)) {
+            this.stop();
+            return;
+        }
+        if (DwarfCannonManager.handleSecondObjectAction(this.player, this.objectId, this.objectX, this.objectY, this.objectPlane)) {
             this.stop();
             return;
         }

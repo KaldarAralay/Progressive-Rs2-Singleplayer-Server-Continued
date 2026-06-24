@@ -28,6 +28,7 @@ import com.rs2.model.combat.hit.HitDefinition;
 import com.rs2.model.combat.hit.HitType;
 import com.rs2.model.dialogue.DialogueManager;
 import com.rs2.model.gameplay.barrows.BarrowsManager;
+import com.rs2.model.gameplay.dwarfcannon.DwarfCannonManager;
 import com.rs2.model.gameplay.godwars.GodWarsDungeonManager;
 import com.rs2.model.gameplay.magetrainingarena.MageTrainingArenaRewardShop;
 import com.rs2.model.gameplay.partyroom.PartyRoomManager;
@@ -1275,6 +1276,9 @@ implements PacketHandler {
             return;
         }
         if (player.getQuestManager().handleInventoryItemFirstOption(interfaceId, itemId)) {
+            return;
+        }
+        if (DwarfCannonManager.handleInventoryItemFirstOption(player, itemId)) {
             return;
         }
         if (BirdNestSearchHandler.searchNest(player, itemId)) {

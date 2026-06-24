@@ -16,6 +16,7 @@ import com.rs2.model.message.MessageOfTheWeek;
 import com.rs2.model.music.MusicTrackDefinition;
 import com.rs2.model.objects.DynamicObject;
 import com.rs2.model.objects.LoadedWorldObject;
+import com.rs2.model.objects.ObjectManager;
 import com.rs2.model.objects.WorldObjectLookup;
 import com.rs2.model.objects.functions.DoubleDoorHandler;
 import com.rs2.model.player.BankRearrangeMode;
@@ -1245,15 +1246,25 @@ public final class PacketSender {
             return this;
         }
         LoadedWorldObject loadedWorldObject = WorldObjectLookup.findObjectAt(n, n2, n3);
+        int objectType;
+        int objectOrientation;
         if (loadedWorldObject == null) {
-            return this;
+            DynamicObject dynamicObject = ObjectManager.findDynamicObjectAt(n, n2, n3);
+            if (dynamicObject == null) {
+                return this;
+            }
+            objectType = dynamicObject.getWorldObject().getType();
+            objectOrientation = dynamicObject.orientation;
+        } else {
+            objectType = loadedWorldObject.getType();
+            objectOrientation = loadedWorldObject.getOrientation();
         }
         this.sendLocalScenePosition(new Position(n, n2, n3));
         PacketWriter packetWriter = PacketBuffer.allocateWriter(5);
         packetWriter.writeOpcode(this.player.getOutboundCipher(), 160);
         packetWriter.writeByte(0, ByteTransform.SUBTRACT);
-        packetWriter.writeByte((loadedWorldObject.getType() << 2) + (loadedWorldObject.getOrientation() & 3), ByteTransform.SUBTRACT);
-        packetWriter.writeShort(127, ByteTransform.ADD);
+        packetWriter.writeByte((objectType << 2) + (objectOrientation & 3), ByteTransform.SUBTRACT);
+        packetWriter.writeShort(n4, ByteTransform.ADD);
         this.player.writePacketBuffer(packetWriter.getBuffer());
         return this;
     }
