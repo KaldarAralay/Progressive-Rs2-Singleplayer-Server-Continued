@@ -106,6 +106,8 @@ extends QuestScript {
     private static final Position TREE_GNOME_VILLAGE_DUNGEON_POSITION = new Position(2533, 9554, 0);
     private static final Position TREE_GNOME_VILLAGE_DUNGEON_EXIT_POSITION = new Position(2532, 3155, 0);
     private static final Position WATERFALL_ENTRY_POSITION = new Position(2575, 9861, 0);
+    private static final Position FIRE_GIANT_ROOM_DOOR_POSITION = new Position(2568, 9892, 0);
+    private static final Position FIRE_GIANT_CORRIDOR_DOOR_POSITION = new Position(2568, 9894, 0);
     private static final Position ORIGINAL_ROOM_DOOR_POSITION = new Position(2566, 9901, 0);
     private static final Position ORIGINAL_ROOM_EXIT_POSITION = new Position(2566, 9900, 0);
     private static final Position PUZZLE_ROOM_POSITION = new Position(2566, 9902, 0);
@@ -837,6 +839,10 @@ extends QuestScript {
             return false;
         }
         if (!bl) {
+            if (WaterfallQuest.isFireGiantCorridorDoorCoord(n2, n3)) {
+                player.packetSender.sendGameMessage("The door is locked.");
+                return true;
+            }
             if (WaterfallQuest.isRaisedBaxtorianDoorCoord(n2, n3) && player.getPosition().getY() >= 9895) {
                 player.packetSender.sendGameMessage("You open the door and walk through.");
                 player.moveTo(ORIGINAL_ROOM_EXIT_POSITION);
@@ -855,6 +861,14 @@ extends QuestScript {
             return true;
         }
         player.packetSender.sendGameMessage("You open the door and walk through.");
+        if (WaterfallQuest.isFireGiantCorridorDoorCoord(n2, n3)) {
+            if (player.getPosition().getY() > 9893) {
+                player.moveTo(FIRE_GIANT_ROOM_DOOR_POSITION);
+            } else {
+                player.moveTo(FIRE_GIANT_CORRIDOR_DOOR_POSITION);
+            }
+            return true;
+        }
         if (WaterfallQuest.isOriginalBaxtorianDoorCoord(n2, n3)) {
             if (player.getPosition().getY() > n3) {
                 player.moveTo(ORIGINAL_ROOM_EXIT_POSITION);
@@ -1182,6 +1196,10 @@ extends QuestScript {
 
     private static boolean isOriginalBaxtorianDoorCoord(int n, int n2) {
         return WaterfallQuest.isNear(n, n2, 2566, 9901, 1);
+    }
+
+    private static boolean isFireGiantCorridorDoorCoord(int n, int n2) {
+        return WaterfallQuest.isNear(n, n2, 2568, 9893, 1);
     }
 
     private static boolean isRaisedBaxtorianDoorCoord(int n, int n2) {
