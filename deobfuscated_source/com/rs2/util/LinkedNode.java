@@ -1,0 +1,8 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package com.rs2.util;
+
+public class LinkedNode {
+}
+

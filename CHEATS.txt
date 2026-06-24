@@ -1,0 +1,39 @@
+Cheats: (to use type in chatbox, add put :: infront of the cheat)
+home - teleports you to lumbridge
+runes - spawns 10k each rune
+nfood - spawns 1k of different noted foods
+food - spawns 20 lobs
+money - spawns 1m coins
+arrows - spawns 10k each arrow
+empty - deletes items from inventory
+bank - opens bank
+god - turns godmode on/off
+run - fills run energy
+irun - infinite run energy mode on/off (godmode also does this)
+pray - fills prayer
+nbones - spawns 1k bones and big bones
+quests - completes quests
+rquests - resets quests
+lquest NAME - lookup quest id
+rquest ID - reset quest
+cquest ID - complete quest
+music - unlocks all songs
+item or item # (# = item count) - opens item spawn menu
+master - max lvl all skills
+modern - switch to modern magic
+ancient - switch to ancient magic
+skiptask - skips slayer task
+char - change look
+rchar - randomize look
+bot - starts botting (NOTE: also uses quests cheat)
+ms - switch movement system
+
+lvls - adds right click option to skill menus to set skill lvls
+ctrl + shift + click - teleport to destination
+
+To pk as team:
+- Login with ur accounts and set them ready to go to wild.
+- Do ::inv PLAYERNAME with the leader account
+- Accept with ur other accounts
+- Once ur ready to go to wild do ::pk with ur other accounts,
+and the server will start controlling them and u will be playing as the group leader

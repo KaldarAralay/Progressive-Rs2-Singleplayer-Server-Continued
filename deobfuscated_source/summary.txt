@@ -1,0 +1,189 @@
+Summary for .\Server-deob-pass1.jar
+Decompiled with CFR 0.152
+
+
+com.rs2.Server
+----------------------------
+
+processGameCycle()
+  Could not resolve type clashes
+  Unable to fully structure code
+sleepUntilNextCycle()
+  Unable to fully structure code
+
+
+com.rs2.model.GameplayHelper
+----------------------------
+
+loadObjectDefinitions()
+  Unable to fully structure code
+
+
+com.rs2.bot.combat.BotCombatLoadoutManager
+----------------------------
+
+prepareMagicLoadout(com.rs2.model.player.Player )
+  Unable to fully structure code
+
+
+com.rs2.model.bankpin.BankPinManager
+----------------------------
+
+handleButtonClick(int )
+  Unable to fully structure code
+
+
+com.rs2.model.combat.CombatManager
+----------------------------
+
+finishDeath(com.rs2.model.Entity com.rs2.model.Entity boolean )
+  Unable to fully structure code
+
+
+com.rs2.model.dialogue.DialogueManager
+----------------------------
+
+showNpcOneLineDialogue(java.lang.String int )
+  Unable to fully structure code
+showNpcTwoLineDialogue(java.lang.String java.lang.String int )
+  Unable to fully structure code
+showNpcThreeLineDialogue(java.lang.String java.lang.String java.lang.String int )
+  Unable to fully structure code
+showNpcFourLineDialogue(java.lang.String java.lang.String java.lang.String java.lang.String int )
+  Unable to fully structure code
+showAlternateNpcThreeLineDialogue(java.lang.String java.lang.String java.lang.String int )
+  Unable to fully structure code
+continueDialogueWithNpcId(com.rs2.model.player.Player int int int int )
+  Unable to fully structure code
+
+
+com.rs2.model.gameplay.barrows.BarrowsManager
+----------------------------
+
+awardChestRewards(com.rs2.model.player.Player )
+  Could not resolve type clashes
+  Unable to fully structure code
+generateTunnelRoute(com.rs2.model.player.Player boolean )
+  Handled impossible loop by duplicating code
+
+
+com.rs2.model.gameplay.duel.DuelSession
+----------------------------
+
+startDuel()
+  Handled impossible loop by duplicating code
+
+
+com.rs2.model.gameplay.magetrainingarena.EnchantmentChamberController
+----------------------------
+
+handleObjectAction(int )
+  Unable to fully structure code
+
+
+com.rs2.model.skill.farming.BushPatchManager
+----------------------------
+
+refreshConfig()
+  Unable to fully structure code
+
+
+com.rs2.model.skill.magic.MagicSpellAction
+----------------------------
+
+castSuperheatItem(int )
+  Unable to fully structure code
+
+
+com.rs2.model.combat.AttackStyleDefinition
+----------------------------
+
+climbOffsetLadder(com.rs2.model.player.Player java.lang.String )
+  Unable to fully structure code
+
+
+com.rs2.model.player.SocialManager
+----------------------------
+
+refreshFriendStatuses(boolean )
+  Unable to fully structure code
+
+
+com.rs2.model.player.BankManager
+----------------------------
+
+rearrangeBankItem(com.rs2.model.player.Player int int int int )
+  Exception : org.benf.cfr.reader.util.ConfusedCFRException: Statement already marked as first in another block
+
+
+com.rs2.model.player.Player
+----------------------------
+
+process()
+  Unable to fully structure code
+randomizeAppearance()
+  Handled impossible loop by duplicating code
+
+
+com.rs2.model.player.EquipmentManager
+----------------------------
+
+refreshBarrowsSetEffects()
+  Unable to fully structure code
+
+
+com.rs2.model.travel.TravelManager
+----------------------------
+
+handleGnomeGliderButton(com.rs2.model.player.Player int )
+  Unable to fully structure code
+  Could not resolve type clashes
+
+
+com.rs2.net.packet.PacketSender
+----------------------------
+
+a(com.rs2.model.objects.LoadedWorldObject boolean boolean )
+  Unable to fully structure code
+
+
+com.rs2.net.packet.handler.ButtonClickPacketHandler
+----------------------------
+
+handle(com.rs2.model.player.Player com.rs2.net.packet.IncomingPacket )
+  Unable to fully structure code
+
+
+com.rs2.net.packet.handler.ItemActionPacketHandler
+----------------------------
+
+handle(com.rs2.model.player.Player com.rs2.net.packet.IncomingPacket )
+  Unable to fully structure code
+handleInventoryItemFirstOption(com.rs2.model.player.Player com.rs2.net.packet.IncomingPacket )
+  Unable to fully structure code
+
+
+com.rs2.net.packet.handler.InterfaceInputPacketHandler
+----------------------------
+
+handle(com.rs2.model.player.Player com.rs2.net.packet.IncomingPacket )
+  Unable to fully structure code
+  Could not resolve type clashes
+
+
+com.rs2.util.CharacterFileManager
+----------------------------
+
+writePlayerFile(com.rs2.model.player.Player )
+  Handled impossible loop by duplicating code
+saveCharacterFileRecord(com.rs2.model.player.CharacterFileRecord )
+  Handled impossible loop by duplicating code
+loadPlayerFromFile(java.lang.String com.rs2.model.player.Player )
+  Unable to fully structure code
+
+
+com.rs2.model.combat.requirement.SpellRuneCostRequirement
+----------------------------
+
+buildRuneCosts(com.rs2.model.player.Player com.rs2.model.item.ItemStack[] )
+  Unable to fully structure code

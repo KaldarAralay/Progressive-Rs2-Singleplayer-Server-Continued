@@ -1,0 +1,28 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package com.rs2.model.cutscene;
+
+import com.rs2.model.cutscene.Cutscene;
+import com.rs2.model.cutscene.CutsceneStep;
+import com.rs2.model.player.Player;
+
+public final class CutsceneSceneSetupStep
+extends CutsceneStep {
+    private /* synthetic */ Cutscene cutscene;
+    private final /* synthetic */ Player player;
+
+    public CutsceneSceneSetupStep(Cutscene cutscene, Cutscene cutscene2, int n, Player player) {
+        super(cutscene, 4);
+        this.cutscene = cutscene2;
+        this.player = player;
+    }
+
+    @Override
+    public final void executeStep() {
+        Player player = this.player;
+        player.packetSender.showInterface(18679);
+        this.cutscene.setupScene();
+    }
+}
+

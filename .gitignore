@@ -1,0 +1,32 @@
+# Local build/test output
+qa-output/
+*.class
+*.log
+
+# Runtime logs
+/data/err.log
+/data/minutes.log
+
+# Local character/runtime saves
+/data/characters/*
+!/data/characters/.gitkeep
+/data/backups/*
+!/data/backups/.gitkeep
+/data/dead hcim characters/*
+!/data/dead hcim characters/.gitkeep
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+
+# Python helper caches
+__pycache__/
+*.pyc
+
+# OS files
+Thumbs.db
+.DS_Store
