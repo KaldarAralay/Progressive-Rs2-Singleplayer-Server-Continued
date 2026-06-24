@@ -12,6 +12,7 @@ import com.rs2.model.item.ItemStack;
 import com.rs2.model.objects.ObjectDefinition;
 import com.rs2.model.objects.ObjectManager;
 import com.rs2.model.player.Player;
+import com.rs2.model.quest.impl.WaterfallQuest;
 import com.rs2.model.skill.SkillActionHelper;
 import com.rs2.net.packet.ByteOrder;
 import com.rs2.net.packet.ByteTransform;
@@ -75,6 +76,9 @@ implements PacketHandler {
                 if (player.getPlayerRights() > 1 && ServerSettings.debugModeEnabled) {
                     System.out.println("first click id = " + player.getInteractionTargetId() + " x = " + player.getInteractionTargetX() + " y = " + player.getInteractionTargetY() + " type " + SkillActionHelper.getObjectType(player.getInteractionTargetId(), player.getInteractionTargetX(), player.getInteractionTargetY(), player.getPosition().getPlane()));
                 }
+                if (ObjectInteractionPacketHandler.handleImmediateWaterfallRoute(player)) {
+                    return;
+                }
                 EntityTargetMovement.clearMovementTarget(player);
                 ObjectManager.prepareObjectInteractionMovement(player, player.getInteractionTargetId(), player.getInteractionTargetX(), player.getInteractionTargetY());
                 ObjectInteractionPacketHandler.queueObjectInteractionMovement(player);
@@ -92,6 +96,9 @@ implements PacketHandler {
                 }
                 if (player.getPlayerRights() > 1 && ServerSettings.debugModeEnabled) {
                     System.out.println("second click id = " + player.getInteractionTargetId() + " x = " + player.getInteractionTargetX() + " y = " + player.getInteractionTargetY());
+                }
+                if (ObjectInteractionPacketHandler.handleImmediateWaterfallRoute(player)) {
+                    return;
                 }
                 EntityTargetMovement.clearMovementTarget(player);
                 ObjectManager.prepareObjectInteractionMovement(player, player.getInteractionTargetId(), player.getInteractionTargetX(), player.getInteractionTargetY());
@@ -111,6 +118,9 @@ implements PacketHandler {
                 if (player.getPlayerRights() > 1 && ServerSettings.debugModeEnabled) {
                     System.out.println("third click id = " + player.getInteractionTargetId() + " x = " + player.getInteractionTargetX() + " y = " + player.getInteractionTargetY());
                 }
+                if (ObjectInteractionPacketHandler.handleImmediateWaterfallRoute(player)) {
+                    return;
+                }
                 EntityTargetMovement.clearMovementTarget(player);
                 ObjectManager.prepareObjectInteractionMovement(player, player.getInteractionTargetId(), player.getInteractionTargetX(), player.getInteractionTargetY());
                 ObjectInteractionPacketHandler.queueObjectInteractionMovement(player);
@@ -128,6 +138,9 @@ implements PacketHandler {
                 }
                 if (player.getPlayerRights() > 1 && ServerSettings.debugModeEnabled) {
                     System.out.println("fourth click id = " + player.getInteractionTargetId() + " x = " + player.getInteractionTargetX() + " y = " + player.getInteractionTargetY());
+                }
+                if (ObjectInteractionPacketHandler.handleImmediateWaterfallRoute(player)) {
+                    return;
                 }
                 EntityTargetMovement.clearMovementTarget(player);
                 ObjectManager.prepareObjectInteractionMovement(player, player.getInteractionTargetId(), player.getInteractionTargetX(), player.getInteractionTargetY());
@@ -155,6 +168,12 @@ implements PacketHandler {
                 InteractionDispatcher.dispatchCurrentInteraction(player);
             }
         }
+    }
+
+    private static boolean handleImmediateWaterfallRoute(Player player) {
+        ObjectDefinition objectDefinition = ObjectDefinition.forId(player.getInteractionTargetId());
+        String string = objectDefinition == null ? "" : objectDefinition.name.toLowerCase();
+        return WaterfallQuest.handleWaterfallRouteObject(player, player.getInteractionTargetId(), string, player.getInteractionTargetX(), player.getInteractionTargetY());
     }
 
     private static void queueObjectInteractionMovement(Player player) {

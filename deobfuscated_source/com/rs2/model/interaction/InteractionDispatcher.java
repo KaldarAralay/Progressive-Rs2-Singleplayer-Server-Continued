@@ -28,6 +28,7 @@ import com.rs2.model.objects.WorldObject;
 import com.rs2.model.objects.WorldObjectLookup;
 import com.rs2.model.player.PetManager;
 import com.rs2.model.player.Player;
+import com.rs2.model.quest.impl.WaterfallQuest;
 import com.rs2.model.skill.magic.SpellDefinition;
 import com.rs2.util.GameUtil;
 import com.rs2.util.GameplayTrace;
@@ -60,6 +61,12 @@ public final class InteractionDispatcher {
                 if (GameplayTrace.enabled()) {
                     GameplayTrace.log("schedule first-object task player=" + GameplayTrace.describe(player) + " seq=" + n5 + " objectId=" + n + " name=" + object + " x=" + n2 + " y=" + n3 + " plane=" + n4);
                 }
+                if (WaterfallQuest.handleWaterfallRiverAction(player, n, (String)object, n2, n3)) {
+                    return;
+                }
+                if (WaterfallQuest.handleWaterfallRouteObject(player, n, (String)object, n2, n3)) {
+                    return;
+                }
                 World.scheduleTickTask(new FirstObjectActionTask(1, true, player, n5, n, n2, n3, n4, (String)object));
                 return;
             }
@@ -69,6 +76,14 @@ public final class InteractionDispatcher {
                 int n7 = player.getInteractionTargetY();
                 int n8 = player.getInteractionTargetPlane();
                 int n9 = player.nextActionSequence();
+                ObjectDefinition objectDefinition = ObjectDefinition.forId(n);
+                String string = objectDefinition == null ? "" : objectDefinition.name.toLowerCase();
+                if (WaterfallQuest.handleWaterfallRiverAction(player, n, string, n6, n7)) {
+                    return;
+                }
+                if (WaterfallQuest.handleWaterfallRouteObject(player, n, string, n6, n7)) {
+                    return;
+                }
                 World.scheduleTickTask(new SecondObjectActionTask(1, true, player, n9, n, n6, n7, n8));
                 return;
             }
@@ -78,6 +93,14 @@ public final class InteractionDispatcher {
                 int n11 = player.getInteractionTargetY();
                 int n12 = player.getInteractionTargetPlane();
                 int n13 = player.nextActionSequence();
+                ObjectDefinition objectDefinition = ObjectDefinition.forId(n);
+                String string = objectDefinition == null ? "" : objectDefinition.name.toLowerCase();
+                if (WaterfallQuest.handleWaterfallRiverAction(player, n, string, n10, n11)) {
+                    return;
+                }
+                if (WaterfallQuest.handleWaterfallRouteObject(player, n, string, n10, n11)) {
+                    return;
+                }
                 World.scheduleTickTask(new ThirdObjectActionTask(1, true, player, n13, n, n10, n11, n12));
                 return;
             }
@@ -87,6 +110,14 @@ public final class InteractionDispatcher {
                 int n15 = player.getInteractionTargetY();
                 int n16 = player.getInteractionTargetPlane();
                 int n17 = player.nextActionSequence();
+                ObjectDefinition objectDefinition = ObjectDefinition.forId(n);
+                String string = objectDefinition == null ? "" : objectDefinition.name.toLowerCase();
+                if (WaterfallQuest.handleWaterfallRiverAction(player, n, string, n14, n15)) {
+                    return;
+                }
+                if (WaterfallQuest.handleWaterfallRouteObject(player, n, string, n14, n15)) {
+                    return;
+                }
                 World.scheduleTickTask(new FourthObjectActionTask(1, true, player, n17, n, n14, n15, n16));
                 return;
             }
@@ -113,6 +144,10 @@ public final class InteractionDispatcher {
                 if (npc.isInApeAtoll() && (n = GameplayHelper.getNpcShopId(player.getInteractionTargetId())) >= 0 && !player.ez()) {
                     Player player3 = player;
                     player3.packetSender.sendGameMessage("This npc is not interested in talking with you right now.");
+                    return;
+                }
+                if (WaterfallQuest.handleWaterfallNpcPreAction(player, npc)) {
+                    EntityTargetMovement.clearMovementTarget(player);
                     return;
                 }
                 if (npc.getNpcId() == 1469 && player.es()) {
@@ -154,6 +189,11 @@ public final class InteractionDispatcher {
                 int n22 = player.getInteractionTargetId();
                 int n23 = player.getSelectedItemId();
                 int n24 = player.nextActionSequence();
+                ObjectDefinition objectDefinition = ObjectDefinition.forId(n22);
+                String string = objectDefinition == null ? "" : objectDefinition.name.toLowerCase();
+                if (WaterfallQuest.handleWaterfallItemOnObject(player, n23, n22, string, n, n20)) {
+                    return;
+                }
                 LoadedWorldObject loadedWorldObject = WorldObjectLookup.findObjectByIdAt(n22, n, n20, n21);
                 if (loadedWorldObject == null) {
                     ObjectManager.getInstance();

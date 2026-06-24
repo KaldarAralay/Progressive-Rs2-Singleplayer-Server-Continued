@@ -207,6 +207,59 @@ extends QuestScript {
         return true;
     }
 
+    private boolean handleElkoyMazeShuttleDialogue(Player player, int n, int n2) {
+        boolean bl = TreeGnomeVillageQuest.isOutsideMazeElkoyInteraction(player);
+        if (n == 1) {
+            player.getDialogueManager().showPlayerOneLineDialogue("Hello Elkoy.", 591);
+            return true;
+        }
+        if (n == 2) {
+            if (bl) {
+                player.getDialogueManager().showNpcOneLineDialogue("Would you like me to show you the way to the Village?", 591);
+            } else {
+                player.getDialogueManager().showNpcOneLineDialogue("Would you like me to show you the way out of the Village?", 591);
+            }
+            return true;
+        }
+        if (n == 3) {
+            player.getDialogueManager().showTwoOptions("Yes please.", "No thanks Elkoy.");
+            return true;
+        }
+        if (n == 4) {
+            if (n2 == 1) {
+                player.getDialogueManager().showPlayerOneLineDialogue("Yes please.", 591);
+                player.getDialogueManager().setNextDialogueStep(5);
+                return true;
+            }
+            player.getDialogueManager().finishDialogue();
+            return false;
+        }
+        if (n == 5) {
+            player.getDialogueManager().showNpcOneLineDialogue("Ok then, follow me.", 591);
+            return true;
+        }
+        if (n == 6) {
+            player.moveTo(bl ? new Position(2515, 3159, 0) : new Position(2504, 3191, 0));
+            player.getDialogueManager().finishDialogue();
+            return false;
+        }
+        return false;
+    }
+
+    private static boolean isOutsideMazeElkoyInteraction(Player player) {
+        if (player.getInteractionTarget() instanceof Npc) {
+            Npc npc = (Npc)player.getInteractionTarget();
+            if (npc.getNpcId() == 473 || npc.getNpcId() == 474) {
+                return TreeGnomeVillageQuest.isCloserToOutsideMaze(npc.getPosition());
+            }
+        }
+        return TreeGnomeVillageQuest.isCloserToOutsideMaze(player.getPosition());
+    }
+
+    private static boolean isCloserToOutsideMaze(Position position) {
+        return GameUtil.getDistance(position, new Position(2504, 3191, position.getPlane())) <= GameUtil.getDistance(position, new Position(2515, 3159, position.getPlane()));
+    }
+
     @Override
     public final boolean handleNpcDialogue(Player player, int n, int n2, int n3, int n4) {
         if (n == 469) {
@@ -302,7 +355,7 @@ extends QuestScript {
                     return true;
                 }
                 if (n2 == 2) {
-                    DialogueManager.continueDialogue(player, 474, 100, 0);
+                    DialogueManager.continueDialogue(player, 473, 100, 0);
                     player.moveToPreservingInteractionState(new Position(2504, 3191, 0));
                     return true;
                 }
@@ -382,7 +435,7 @@ extends QuestScript {
             }
             if (n4 == 21) {
                 if (n2 == 17) {
-                    DialogueManager.continueDialogue(player, 474, 100, 0);
+                    DialogueManager.continueDialogue(player, 473, 100, 0);
                     player.moveToPreservingInteractionState(new Position(2504, 3191, 0));
                     return true;
                 }
@@ -463,8 +516,11 @@ extends QuestScript {
                 }
             }
         }
-        if (n == 474) {
-            if (n4 == 1) {
+        if ((n == 473 || n == 474) && (n4 == 1 || n4 == 2) && n2 != 100) {
+            return this.handleElkoyMazeShuttleDialogue(player, n2, n3);
+        }
+        if (n == 473) {
+            if (n4 == 1 || n4 == 2) {
                 if (n2 == 1) {
                     player.getDialogueManager().showPlayerOneLineDialogue("Hello Elkoy.", 591);
                     return true;
@@ -541,7 +597,7 @@ extends QuestScript {
                     return true;
                 }
                 if (n2 == 8) {
-                    DialogueManager.continueDialogue(player, 473, 100, 0);
+                    DialogueManager.continueDialogue(player, 474, 100, 0);
                     player.moveToPreservingInteractionState(new Position(2515, 3159, 0));
                     return true;
                 }
@@ -591,15 +647,15 @@ extends QuestScript {
                         return true;
                     }
                     if (n2 == 9) {
-                        DialogueManager.continueDialogue(player, 473, 100, 0);
+                        DialogueManager.continueDialogue(player, 474, 100, 0);
                         player.moveToPreservingInteractionState(new Position(2515, 3159, 0));
                         return true;
                     }
                 }
             }
         }
-        if (n == 473) {
-            if (n4 == 1) {
+        if (n == 474) {
+            if (n4 == 1 || n4 == 2) {
                 if (n2 == 1) {
                     player.getDialogueManager().showPlayerOneLineDialogue("Hello Elkoy.", 591);
                     return true;

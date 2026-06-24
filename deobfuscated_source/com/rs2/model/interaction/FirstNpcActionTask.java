@@ -68,6 +68,22 @@ extends TickTask {
             }
             return;
         }
+        if (this.npc.getNpcId() == 305) {
+            if (this.npc.isWithinInteractionDistance(this.player.getPosition(), 3)) {
+                this.npc.getUpdateState().setFaceEntity(this.player.getEncodedIndex());
+                this.player.setInteractionTarget(this.npc);
+                this.player.getUpdateState().setFaceEntity(this.npc.getEncodedIndex());
+                if (this.player.getQuestManager().handleFirstNpcAction(this.player.getInteractionTargetId())) {
+                    EntityTargetMovement.clearMovementTarget(this.player);
+                    this.stop();
+                    return;
+                }
+                DialogueManager.startDialogue(this.player, this.player.getInteractionTargetId());
+                EntityTargetMovement.clearMovementTarget(this.player);
+                this.stop();
+            }
+            return;
+        }
         if (!this.player.isWithinReach(this.npc, 1) || this.player.isOverlapping(this.npc)) {
             return;
         }
