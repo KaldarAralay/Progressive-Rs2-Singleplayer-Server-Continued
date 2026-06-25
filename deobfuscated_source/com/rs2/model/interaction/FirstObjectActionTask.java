@@ -40,6 +40,7 @@ import com.rs2.model.objects.functions.ObeliskTick;
 import com.rs2.model.player.BankManager;
 import com.rs2.model.player.Player;
 import com.rs2.model.quest.QuestDefinition;
+import com.rs2.model.quest.impl.MonksFriendQuest;
 import com.rs2.model.skill.SkillActionHelper;
 import com.rs2.model.skill.agility.AgilityObstacleHandler;
 import com.rs2.model.skill.magic.Spellbook;
@@ -102,6 +103,10 @@ extends TickTask {
                 this.loggedMissingWorldObject = true;
                 GameplayTrace.log("first-object wait missing-world-object seq=" + this.actionSequence + " player=" + GameplayTrace.describe(this.player) + " objectId=" + this.objectId + " x=" + this.objectX + " y=" + this.objectY + " plane=" + this.objectPlane);
             }
+            return;
+        }
+        if (MonksFriendQuest.handleArdougneMonasteryDoor(this.player, this.objectId, this.objectX, this.objectY, this.objectPlane)) {
+            this.stop();
             return;
         }
         Object object = ObjectDefinition.forId(this.player.getInteractionTargetId());
