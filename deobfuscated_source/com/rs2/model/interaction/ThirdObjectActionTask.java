@@ -59,6 +59,10 @@ extends TickTask {
         if (object2 != null) {
             this.player.getUpdateState().setFacePosition(position.centerForSize(((ObjectDefinition)object2).getMaxDimension()));
         }
+        if (this.player.getQuestManager().handleThirdObjectAction(this.objectId, this.objectX, this.objectY)) {
+            this.stop();
+            return;
+        }
         switch (this.player.getInteractionTargetId()) {
             case 3194: {
                 ObjectManager.getInstance();

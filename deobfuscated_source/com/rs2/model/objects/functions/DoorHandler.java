@@ -175,7 +175,7 @@ public final class DoorHandler {
             ((DoorHandler)object).currentX = ((DoorHandler)object).originalX;
             ((DoorHandler)object).currentY = ((DoorHandler)object).originalY;
         }
-        if (n == 22 || n == 2550 || n == 2551 || n == 2555 || n == 2556 || n == 2558 || n == 2557 || n == 3014) {
+        if (n == 22 || n == 2550 || n == 2551 || n == 2555 || n == 2556 || n == 2558 || n == 2557 || n == 3014 || DoorHandler.shouldPreserveObjectIdWhenToggled(((DoorHandler)object).originalObjectId)) {
             ((DoorHandler)object).currentObjectId = n;
         } else if (((DoorHandler)object).currentObjectId == ((DoorHandler)object).originalObjectId) {
             if (!((DoorHandler)object).initiallyOpen) {
@@ -279,6 +279,10 @@ public final class DoorHandler {
             ++n2;
         }
         return false;
+    }
+
+    private static boolean shouldPreserveObjectIdWhenToggled(int n) {
+        return n == 2705 || n == 2706;
     }
 
     static /* synthetic */ int getCurrentObjectId(DoorHandler doorHandler) {

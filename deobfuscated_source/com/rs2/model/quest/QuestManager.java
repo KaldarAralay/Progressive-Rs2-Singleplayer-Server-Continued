@@ -158,6 +158,28 @@ public final class QuestManager {
         return false;
     }
 
+    public final boolean handleThirdObjectAction(int n, int n2, int n3) {
+        QuestHook questHook;
+        int n4 = 0;
+        while (n4 < QuestEventRegistry.eventHookCount) {
+            questHook = QuestEventRegistry.getEventHook(n4);
+            if (questHook.getQuestId() != -1 && questHook.handleThirdObjectAction(this.player, n, n2, n3, this.player.questHookStates[n4])) {
+                return true;
+            }
+            ++n4;
+        }
+        n4 = 0;
+        while (n4 < QuestDefinition.questCount) {
+            QuestHook questHook2;
+            questHook = QuestDefinition.getQuestScript(n4);
+            if (!(questHook.getQuestId() == -1 || !QuestManager.isQuestJournalButtonAvailable(questHook.getQuestId()) || QuestDefinition.forId((questHook2 = questHook).getQuestId()).isMembersOnly() && !this.player.isMember() || QuestDefinition.forId((questHook2 = questHook).getQuestId()).isMembersOnly() && ServerSettings.freeToPlayWorld || !questHook.handleThirdObjectAction(this.player, n, n2, n3, this.player.getQuestState(n4)))) {
+                return true;
+            }
+            ++n4;
+        }
+        return false;
+    }
+
     public final boolean handleGroundItemInteraction(int n) {
         QuestHook questHook;
         int n2 = 0;

@@ -71,6 +71,10 @@ public abstract class QuestHook {
         return false;
     }
 
+    public boolean handleThirdObjectAction(Player player, int n, int n2, int n3, int n4) {
+        return false;
+    }
+
     public boolean handleCombatDeath(Entity entity, Entity entity2, int n) {
         return false;
     }
