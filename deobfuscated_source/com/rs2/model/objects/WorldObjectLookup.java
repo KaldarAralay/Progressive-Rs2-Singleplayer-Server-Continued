@@ -11,6 +11,7 @@ import com.rs2.model.objects.LoadedWorldObject;
 import com.rs2.model.objects.ObjectDefinition;
 import com.rs2.model.objects.WorldObjectRegionIndex;
 import com.rs2.model.skill.agility.AgilityObstacleHandler;
+import java.util.Iterator;
 import java.util.logging.Logger;
 
 public class WorldObjectLookup {
@@ -75,6 +76,20 @@ public class WorldObjectLookup {
             return loadedWorldObject;
         }
         return null;
+    }
+
+    public static boolean removeObjectByIdAt(int n, int n2, int n3, int n4) {
+        Position position = new Position(n2, n3, n4);
+        World.getInstance().getObjectRegionIndex();
+        AgilityObstacleHandler bucket = WorldObjectRegionIndex.getOrCreateRegionBucket(position);
+        Iterator iterator = bucket.getLoadedObjects().iterator();
+        while (iterator.hasNext()) {
+            LoadedWorldObject loadedWorldObject = (LoadedWorldObject)iterator.next();
+            if (loadedWorldObject.getWorldObject().getObjectId() != n || !loadedWorldObject.getPosition().equals(position)) continue;
+            iterator.remove();
+            return true;
+        }
+        return false;
     }
 
 }

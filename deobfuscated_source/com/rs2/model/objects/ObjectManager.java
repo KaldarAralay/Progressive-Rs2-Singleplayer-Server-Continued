@@ -192,8 +192,12 @@ public final class ObjectManager {
         }
         for (Object visibleDynamicObjectObject : player.visibleDynamicObjects) {
             DynamicObject dynamicObject = (DynamicObject)visibleDynamicObjectObject;
+            boolean bl2 = ObjectManager.isVisibleToPlayer(dynamicObject, player);
             if (activeDynamicObjects.size() == 0) {
-                if (!ObjectManager.isVisibleToPlayer(dynamicObject, player)) continue;
+                if (!bl2) {
+                    player.pendingDynamicObjectRemovals.add(dynamicObject);
+                    continue;
+                }
                 player.pendingDynamicObjectRemovals.add(dynamicObject);
                 Player player2 = player;
                 player2.packetSender.sendObjectCreate(dynamicObject.restoreObjectId, dynamicObject.getWorldObject().getPosition().getX(), dynamicObject.getWorldObject().getPosition().getY(), dynamicObject.getWorldObject().getPosition().getPlane(), dynamicObject.orientation, dynamicObject.getWorldObject().getType());
@@ -206,8 +210,9 @@ public final class ObjectManager {
                 bl = true;
                 break;
             }
-            if (bl || !ObjectManager.isVisibleToPlayer(dynamicObject, player)) continue;
+            if (bl && bl2) continue;
             player.pendingDynamicObjectRemovals.add(dynamicObject);
+            if (!bl2) continue;
             Player player3 = player;
             player3.packetSender.sendObjectCreate(dynamicObject.restoreObjectId, dynamicObject.getWorldObject().getPosition().getX(), dynamicObject.getWorldObject().getPosition().getY(), dynamicObject.getWorldObject().getPosition().getPlane(), dynamicObject.orientation, dynamicObject.getWorldObject().getType());
         }

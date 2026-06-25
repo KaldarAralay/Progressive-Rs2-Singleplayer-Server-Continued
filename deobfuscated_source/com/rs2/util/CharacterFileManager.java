@@ -4455,11 +4455,11 @@ public final class CharacterFileManager {
     }
 
     private static void applyBotRecord(CharacterFileRecord record, Player player) {
-        player.botEnabled = record.botEnabled;
         if (!record.botEnabled) {
             return;
         }
-        player.botMode = record.botMode;
+        // Preserve the live object flags selected by server startup. The original loader
+        // consumes the saved bot mode byte but does not apply it during login.
         player.currentBotTaskTypeId = record.currentBotTaskTypeId;
         player.currentBotTaskIndex = record.currentBotTaskIndex;
         player.deferredBotTaskTypeId = record.deferredBotTaskTypeId;

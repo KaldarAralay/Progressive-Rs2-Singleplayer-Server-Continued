@@ -16,12 +16,14 @@ import com.rs2.model.item.ItemStack;
 import com.rs2.model.npc.Npc;
 import com.rs2.model.npc.NpcDefinition;
 import com.rs2.model.objects.DynamicObject;
+import com.rs2.model.objects.LoadedWorldObject;
 import com.rs2.model.objects.ObjectManager;
 import com.rs2.model.objects.WorldObjectLookup;
-import com.rs2.model.objects.functions.DoorHandler;
 import com.rs2.model.player.Player;
 import com.rs2.model.quest.QuestScript;
 import com.rs2.util.GameUtil;
+import com.rs2.util.path.ProjectileCollisionMap;
+import com.rs2.util.path.WalkingCollisionMap;
 
 public final class MonksFriendQuest
 extends QuestScript {
@@ -46,7 +48,6 @@ extends QuestScript {
     private static final int SURFACE_LADDER = 1765;
     private static final int CAVE_UP_LADDER = 1755;
     private static final int MONASTERY_DOOR = 1530;
-    private static final int MONASTERY_DOOR_OPEN = 1531;
     private static final int DANCE_ANIMATION = 866;
     private static final Position BLANKET_LADDER_POSITION = new Position(2561, 3222, 0);
     private static final Position BLANKET_CAVE_ENTRY_POSITION = new Position(2561, 9621, 0);
@@ -54,6 +55,7 @@ extends QuestScript {
     private static final Position BLANKET_CAVE_EXIT_POSITION = new Position(2561, 3221, 0);
     private static final Position BLANKET_POSITION = new Position(2570, 9604, 0);
     private static final Position BROTHER_OMAD_POSITION = new Position(2604, 3209, 0);
+    private static final Position MONASTERY_FRONT_DOOR_POSITION = new Position(2606, 3219, 0);
     private static final int[][] NPC_SPAWNS = new int[][]{
         new int[]{BROTHER_OMAD, 2604, 3209, 0, 3},
         new int[]{BROTHER_CEDRIC, 2614, 3259, 0, 0},
@@ -95,6 +97,7 @@ extends QuestScript {
             MonksFriendQuest.spawnObjectIfMissing(spawn[0], spawn[1], spawn[2], spawn[3], spawn[4], spawn[5]);
             ++n;
         }
+        MonksFriendQuest.removeMonasteryFrontDoor();
         MonksFriendQuest.spawnBlanketIfMissing();
     }
 
@@ -200,9 +203,6 @@ extends QuestScript {
 
     @Override
     public final boolean handleFirstObjectAction(Player player, int n, int n2, int n3, int n4) {
-        if ((n == MONASTERY_DOOR || n == MONASTERY_DOOR_OPEN) && MonksFriendQuest.isArdougneMonasteryQuestDoor(n2, n3)) {
-            return MonksFriendQuest.handleArdougneMonasteryDoor(player, n, n2, n3, n4);
-        }
         if (n == SURFACE_LADDER && n2 == BLANKET_LADDER_POSITION.getX() && n3 == BLANKET_LADDER_POSITION.getY()) {
             if (player.getQuestState(this.getQuestId()) == 0) {
                 player.packetSender.sendGameMessage("You do not know where this ladder leads.");
@@ -789,33 +789,27 @@ extends QuestScript {
         }
     }
 
-    public static boolean handleArdougneMonasteryDoor(Player player, int n, int n2, int n3, int n4) {
-        if (!MonksFriendQuest.isArdougneMonasteryQuestDoor(n2, n3) || !GameUtil.isWithinDistance(player.getPosition().getX(), player.getPosition().getY(), n2, n3, 1)) {
-            return false;
-        }
-        boolean bl = ObjectManager.findDynamicObjectAt(n2, n3, n4) != null || n == MONASTERY_DOOR_OPEN;
-        int n5 = 0;
-        int n6 = 0;
-        if (n2 == 2602 || n2 == 2610) {
-            n5 = player.getPosition().getX() <= n2 ? 1 : -1;
-        } else {
-            n6 = player.getPosition().getY() <= n3 ? 1 : -1;
-        }
-        if (!DoorHandler.handleDoor(player, n, n2, n3, n4)) {
-            return false;
-        }
-        if (!bl) {
-            player.getPacketSender().queueRelativeMovementStep(n5, n6, true);
-        }
-        return true;
-    }
-
-    private static boolean isArdougneMonasteryQuestDoor(int n, int n2) {
-        return n == 2602 && n2 == 3209 || n == 2610 && n2 == 3209 || n == 2606 && n2 == 3219;
-    }
-
     private static void spawnBlanketIfMissing() {
         GroundItemManager.getInstance().spawn(new GroundItem(new ItemStack(CHILDS_BLANKET, 1), BLANKET_POSITION, (int)GameUtil.secondsToTicks(50L), true));
+    }
+
+    private static void removeMonasteryFrontDoor() {
+        int n = MONASTERY_FRONT_DOOR_POSITION.getX();
+        int n2 = MONASTERY_FRONT_DOOR_POSITION.getY();
+        int n3 = MONASTERY_FRONT_DOOR_POSITION.getPlane();
+        if (ObjectManager.findDynamicObjectAt(n, n2, n3) == null) {
+            LoadedWorldObject loadedWorldObject = WorldObjectLookup.findObjectByIdAt(MONASTERY_DOOR, n, n2, n3);
+            if (loadedWorldObject != null) {
+                new DynamicObject(ServerSettings.placeholderObjectId, n, n2, n3, loadedWorldObject.getOrientation(), loadedWorldObject.getType(), ServerSettings.placeholderObjectId, 999999999, false);
+            }
+        }
+        WorldObjectLookup.removeObjectByIdAt(MONASTERY_DOOR, n, n2, n3);
+        int n4 = n2 - 1;
+        while (n4 <= n2 + 1) {
+            WalkingCollisionMap.clearTileCollision(n, n4, n3);
+            ProjectileCollisionMap.clearTileCollision(n, n4, n3);
+            ++n4;
+        }
     }
 
     private static void spawnNpcIfMissingAt(int n, int n2, int n3, int n4, int n5) {

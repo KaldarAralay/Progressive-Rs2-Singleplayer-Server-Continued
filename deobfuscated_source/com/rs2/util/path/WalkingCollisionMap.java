@@ -475,6 +475,28 @@ public final class WalkingCollisionMap {
         return 0x200000;
     }
 
+    public static void clearTileCollision(int n, int n2, int n3) {
+        n3 %= 4;
+        int n4 = n >> 3;
+        int n5 = n2 >> 3;
+        n4 = (n4 / 8 << 8) + n5 / 8;
+        WalkingCollisionMap[] walkingCollisionMapArray = regions;
+        int n6 = regions.length;
+        int n7 = 0;
+        while (n7 < n6) {
+            WalkingCollisionMap walkingCollisionMap = walkingCollisionMapArray[n7];
+            if (walkingCollisionMap.regionId == n4) {
+                int n8 = walkingCollisionMap.regionId >> 8 << 6;
+                int n9 = (walkingCollisionMap.regionId & 0xFF) << 6;
+                if (walkingCollisionMap.tileFlags[n3] != null) {
+                    walkingCollisionMap.tileFlags[n3][n - n8][n2 - n9] = 0;
+                }
+                return;
+            }
+            ++n7;
+        }
+    }
+
     public static boolean canTravelBetween(int n, int n2, int n3, int n4, int n5, int n6, int n7) {
         n = n3 - n;
         n2 = n4 - n2;

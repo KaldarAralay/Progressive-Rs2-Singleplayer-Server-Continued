@@ -486,6 +486,30 @@ public final class ProjectileCollisionMap {
         return 0;
     }
 
+    public static void clearTileCollision(int n, int n2, int n3) {
+        if (n3 > 3) {
+            n3 = 0;
+        }
+        int n4 = n >> 3;
+        int n5 = n2 >> 3;
+        n4 = (n4 / 8 << 8) + n5 / 8;
+        ProjectileCollisionMap[] projectileCollisionMapArray = regions;
+        int n6 = regions.length;
+        int n7 = 0;
+        while (n7 < n6) {
+            ProjectileCollisionMap projectileCollisionMap = projectileCollisionMapArray[n7];
+            if (projectileCollisionMap.regionId == n4) {
+                int n8 = projectileCollisionMap.regionId >> 8 << 6;
+                int n9 = (projectileCollisionMap.regionId & 0xFF) << 6;
+                if (projectileCollisionMap.tileFlags[n3] != null) {
+                    projectileCollisionMap.tileFlags[n3][n - n8][n2 - n9] = 0;
+                }
+                return;
+            }
+            ++n7;
+        }
+    }
+
     public static void loadCollisionMaps() {
         try {
             CacheStore cacheStore = CacheStore.getInstance();
