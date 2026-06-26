@@ -11,6 +11,7 @@ import com.rs2.model.dialogue.DialogueManager;
 import com.rs2.model.gameplay.magetrainingarena.MageTrainingArenaRewardShop;
 import com.rs2.model.npc.Npc;
 import com.rs2.model.player.Player;
+import com.rs2.model.quest.impl.FishingContestQuest;
 import com.rs2.model.skill.woodcutting.TreeDefinition;
 import com.rs2.model.skill.woodcutting.WoodcuttingHandler;
 import com.rs2.model.task.TickTask;
@@ -90,6 +91,14 @@ extends TickTask {
         if (this.npc.getNpcId() == 3103) {
             this.npc.setInteractionTarget(this.player);
             MageTrainingArenaRewardShop.openRewardShop(this.player);
+            this.stop();
+            return;
+        }
+        if (FishingContestQuest.isContestFishingSpot(this.npc.getNpcId())
+            && FishingContestQuest.handleContestFishingSpot(this.player, this.npc)) {
+            EntityTargetMovement.clearMovementTarget(this.player);
+            this.player.setInteractionTarget(this.npc);
+            this.player.getUpdateState().setFaceEntity(this.npc.getEncodedIndex());
             this.stop();
             return;
         }

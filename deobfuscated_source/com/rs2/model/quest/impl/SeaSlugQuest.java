@@ -1589,8 +1589,7 @@ extends QuestScript {
         if (!NpcDefinition.isDefined(id)) {
             return;
         }
-        Position position = new Position(x, y, plane);
-        if (Npc.findByDefinitionIdAtPosition(id, position) != null) {
+        if (GameplayHelper.isNpcSpawnCoveredByNearbySpawn(id, x, y, plane, 5, NPC_SPAWNS)) {
             return;
         }
         GameplayHelper.spawnNpc(id, x, y, plane, walk);

@@ -52,6 +52,7 @@ import com.rs2.model.player.PlayerConnectionState;
 import com.rs2.model.quest.QuestDefinition;
 import com.rs2.model.quest.QuestEventRegistry;
 import com.rs2.model.quest.impl.DwarfCannonQuest;
+import com.rs2.model.quest.impl.FishingContestQuest;
 import com.rs2.model.quest.impl.MonksFriendQuest;
 import com.rs2.model.quest.impl.SeaSlugQuest;
 import com.rs2.model.quest.impl.TribalTotemQuest;
@@ -335,6 +336,7 @@ implements Runnable {
             NpcDropTable.loadDropTables();
             GameplayHelper.loadNpcSpawns();
             DwarfCannonQuest.spawnMissingContent();
+            FishingContestQuest.spawnMissingContent();
             MonksFriendQuest.spawnMissingContent();
             SeaSlugQuest.spawnMissingContent();
             TribalTotemQuest.spawnMissingContent();

@@ -816,8 +816,7 @@ extends QuestScript {
         if (!NpcDefinition.isDefined(n)) {
             return;
         }
-        Position position = new Position(n2, n3, n4);
-        if (Npc.findByDefinitionIdAtPosition(n, position) != null) {
+        if (GameplayHelper.isNpcSpawnCoveredByNearbySpawn(n, n2, n3, n4, 5, NPC_SPAWNS)) {
             return;
         }
         GameplayHelper.spawnNpc(n, n2, n3, n4, n5);

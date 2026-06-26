@@ -2821,6 +2821,48 @@ public class GameplayHelper {
         }
     }
 
+    public static boolean isNpcSpawnCoveredByNearbySpawn(int id, int x, int y, int plane, int radius, int[][] questSpawnPositions) {
+        Position position = new Position(x, y, plane);
+        if (Npc.findByDefinitionIdAtPosition(id, position) != null) {
+            return true;
+        }
+        Npc[] npcs = World.getNpcs();
+        int n = 0;
+        while (n < npcs.length) {
+            Npc npc = npcs[n];
+            if (npc != null && npc.getNpcId() == id) {
+                Position npcPosition = npc.getPosition();
+                if (npcPosition.getPlane() == plane
+                    && Math.abs(npcPosition.getX() - x) <= radius
+                    && Math.abs(npcPosition.getY() - y) <= radius
+                    && !GameplayHelper.isQuestSpawnPosition(id, npcPosition, questSpawnPositions)) {
+                    return true;
+                }
+            }
+            ++n;
+        }
+        return false;
+    }
+
+    private static boolean isQuestSpawnPosition(int id, Position position, int[][] questSpawnPositions) {
+        if (questSpawnPositions == null) {
+            return false;
+        }
+        int n = 0;
+        while (n < questSpawnPositions.length) {
+            int[] spawn = questSpawnPositions[n];
+            if (spawn != null && spawn.length >= 4
+                && spawn[0] == id
+                && spawn[1] == position.getX()
+                && spawn[2] == position.getY()
+                && spawn[3] == position.getPlane()) {
+                return true;
+            }
+            ++n;
+        }
+        return false;
+    }
+
     public static void spawnNpc(int n, int n2, int n3, int n4, int n5) {
         if (n == 767 || n == 1826) {
             WalkingCollisionMap.addObjectCollision(2620, n2, n3, n4, 0, 10, true);
