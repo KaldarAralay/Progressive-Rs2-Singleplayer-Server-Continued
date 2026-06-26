@@ -51,6 +51,7 @@ import com.rs2.model.player.PetManager;
 import com.rs2.model.player.Player;
 import com.rs2.model.player.PlayerGroup;
 import com.rs2.model.quest.QuestDefinition;
+import com.rs2.model.quest.impl.SeaSlugQuest;
 import com.rs2.model.shop.ShopManager;
 import com.rs2.model.skill.ItemCombinationHandler;
 import com.rs2.model.skill.cooking.FoodPreparationRecipe;
@@ -339,6 +340,9 @@ implements PacketHandler {
             return;
         }
         if (player.getQuestManager().handleItemOnItem(firstItemId, secondItemId) || ServerSettings.content2007Enabled && GodWarsDungeonManager.handleGodWarsItemCombination(player, firstItemId, secondItemId)) {
+            return;
+        }
+        if (SeaSlugQuest.handlePacketItemOnItem(player, firstItemId, secondItemId)) {
             return;
         }
         if (ItemActionPacketHandler.handleFoodPreparation(player, firstItemId, secondItemId)) {

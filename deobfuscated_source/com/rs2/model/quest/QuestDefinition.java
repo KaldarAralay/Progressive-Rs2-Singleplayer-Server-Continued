@@ -36,6 +36,7 @@ import com.rs2.model.quest.impl.RestlessGhostQuest;
 import com.rs2.model.quest.impl.RomeoAndJulietQuest;
 import com.rs2.model.quest.impl.RuneMysteriesQuest;
 import com.rs2.model.quest.impl.ScorpionCatcherQuest;
+import com.rs2.model.quest.impl.SeaSlugQuest;
 import com.rs2.model.quest.impl.SheepShearerQuest;
 import com.rs2.model.quest.impl.ShieldOfArravQuest;
 import com.rs2.model.quest.impl.TribalTotemQuest;
@@ -55,7 +56,7 @@ public final class QuestDefinition {
     public static int questCount = 0;
     public static int questStateCapacity = 200;
     private static QuestDefinition[] definitionsById = new QuestDefinition[0];
-    private static QuestScript[] questScripts = new QuestScript[]{new NullQuestScript(-1), new TutorialQuest(0), new BlackKnightsFortressQuest(1), new CooksAssistantQuest(2), new DemonSlayerQuest(3), new DoricsQuest(4), new DragonSlayerQuest(5), new ErnestTheChickenQuest(6), new GoblinDiplomacyQuest(7), new ImpCatcherQuest(8), new KnightsSwordQuest(9), new PiratesTreasureQuest(10), new PrinceAliRescueQuest(11), new RestlessGhostQuest(12), new RomeoAndJulietQuest(13), new RuneMysteriesQuest(14), new SheepShearerQuest(15), new ShieldOfArravQuest(16), new VampireSlayerQuest(17), new WitchsPotionQuest(18), new DruidicRitualQuest(29), new DwarfCannonQuest(30), new ElementalWorkshopQuest(32), new FamilyCrestQuest(35), new FremennikTrialsQuest(40), new GertrudesCatQuest(42), new GrandTreeQuest(46), new HeroesQuest(50), new HolyGrailQuest(51), new JunglePotionQuest(56), new LostCityQuest(58), new MerlinsCrystalQuest(61), new MonkeyMadnessQuest(62), new MonksFriendQuest(63), new PriestInPerilQuest(72), new ScorpionCatcherQuest(80), new TreeGnomeVillageQuest(95), new TribalTotemQuest(96), new WaterfallQuest(102), new WitchsHouseQuest(103)};
+    private static QuestScript[] questScripts = new QuestScript[]{new NullQuestScript(-1), new TutorialQuest(0), new BlackKnightsFortressQuest(1), new CooksAssistantQuest(2), new DemonSlayerQuest(3), new DoricsQuest(4), new DragonSlayerQuest(5), new ErnestTheChickenQuest(6), new GoblinDiplomacyQuest(7), new ImpCatcherQuest(8), new KnightsSwordQuest(9), new PiratesTreasureQuest(10), new PrinceAliRescueQuest(11), new RestlessGhostQuest(12), new RomeoAndJulietQuest(13), new RuneMysteriesQuest(14), new SheepShearerQuest(15), new ShieldOfArravQuest(16), new VampireSlayerQuest(17), new WitchsPotionQuest(18), new DruidicRitualQuest(29), new DwarfCannonQuest(30), new ElementalWorkshopQuest(32), new FamilyCrestQuest(35), new FremennikTrialsQuest(40), new GertrudesCatQuest(42), new GrandTreeQuest(46), new HeroesQuest(50), new HolyGrailQuest(51), new JunglePotionQuest(56), new LostCityQuest(58), new MerlinsCrystalQuest(61), new MonkeyMadnessQuest(62), new MonksFriendQuest(63), new PriestInPerilQuest(72), new ScorpionCatcherQuest(80), new SeaSlugQuest(81), new TreeGnomeVillageQuest(95), new TribalTotemQuest(96), new WaterfallQuest(102), new WitchsHouseQuest(103)};
 
     public static int getTotalQuestPointReward() {
         int n = 0;

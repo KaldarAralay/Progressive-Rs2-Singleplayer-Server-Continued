@@ -53,6 +53,7 @@ import com.rs2.model.quest.QuestDefinition;
 import com.rs2.model.quest.QuestEventRegistry;
 import com.rs2.model.quest.impl.DwarfCannonQuest;
 import com.rs2.model.quest.impl.MonksFriendQuest;
+import com.rs2.model.quest.impl.SeaSlugQuest;
 import com.rs2.model.quest.impl.TribalTotemQuest;
 import com.rs2.model.quest.impl.WaterfallQuest;
 import com.rs2.model.shop.ShopManager;
@@ -335,6 +336,7 @@ implements Runnable {
             GameplayHelper.loadNpcSpawns();
             DwarfCannonQuest.spawnMissingContent();
             MonksFriendQuest.spawnMissingContent();
+            SeaSlugQuest.spawnMissingContent();
             TribalTotemQuest.spawnMissingContent();
             WaterfallQuest.spawnMissingNpcs();
             TreasureTrailManager.filterRewardItemPools();
