@@ -132,6 +132,7 @@ implements Runnable {
     private static int skillingBotLoginCount;
     private static int progressiveBotLoginCount;
     private static int tradeBotLoginCount;
+    private static int duelBotLoginCount;
     private static int clanWarsBotLoginCount;
     private static int otherBotLoginCount;
     public static int onlinePlayerCount;
@@ -158,6 +159,7 @@ implements Runnable {
         skillingBotLoginCount = 0;
         progressiveBotLoginCount = 0;
         tradeBotLoginCount = 0;
+        duelBotLoginCount = 0;
         clanWarsBotLoginCount = 0;
         otherBotLoginCount = 0;
         onlinePlayerCount = 0;
@@ -400,6 +402,9 @@ implements Runnable {
             if (ServerSettings.tradeBotCount <= 0 && ServerSettings.tradeBotsEnabled) {
                 ServerSettings.tradeBotsEnabled = false;
             }
+            if (ServerSettings.duelBotCount <= 0 && ServerSettings.duelBotsEnabled) {
+                ServerSettings.duelBotsEnabled = false;
+            }
             if (ServerSettings.clanWarsTeamSize <= 0 && ServerSettings.clanWarsBotsEnabled) {
                 ServerSettings.clanWarsBotsEnabled = false;
             }
@@ -412,6 +417,9 @@ implements Runnable {
             }
             if (ServerSettings.tradeBotsEnabled) {
                 configuredBotCount += ServerSettings.tradeBotCount;
+            }
+            if (ServerSettings.duelBotsEnabled) {
+                configuredBotCount += ServerSettings.duelBotCount;
             }
             if (ServerSettings.clanWarsBotsEnabled) {
                 configuredBotCount += ServerSettings.clanWarsTeamSize << 1;
@@ -526,6 +534,10 @@ implements Runnable {
         if (ServerSettings.tradeBotsEnabled && tradeBotLoginCount < ServerSettings.tradeBotCount) {
             ++tradeBotLoginCount;
             return 2;
+        }
+        if (ServerSettings.duelBotsEnabled && duelBotLoginCount < ServerSettings.duelBotCount) {
+            ++duelBotLoginCount;
+            return 7;
         }
         if (ServerSettings.clanWarsBotsEnabled && clanWarsBotLoginCount < ServerSettings.clanWarsTeamSize << 1) {
             int n = ClanWarsBotManager.clanWarsTeamOneBots.size() == ServerSettings.clanWarsTeamSize ? 6 : 5;

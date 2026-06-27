@@ -23,14 +23,15 @@ extends TickTask {
 
     @Override
     public final void execute() {
-        if (this.targetPlayer == null || this.targetPlayer.isDead() || !this.requestingPlayer.isCurrentActionSequence(this.actionSequence)) {
-            EntityTargetMovement.clearMovementTarget(this.requestingPlayer);
-            this.requestingPlayer.setInteractionTarget(null);
-            this.requestingPlayer.getMovementQueue().clear();
-            this.stop();
+        if (!this.isValidDuelRequestTask()) {
+            this.clearRequestState();
             return;
         }
         if (this.requestingPlayer.isWithinReach(this.targetPlayer, 1) && !this.requestingPlayer.isOverlapping(this.targetPlayer) && !EntityTargetMovement.isDiagonalTo(this.requestingPlayer.getPosition(), this.targetPlayer.getPosition())) {
+            if (!this.canCompleteDuelRequest()) {
+                this.clearRequestState();
+                return;
+            }
             if (this.requestingPlayer.isInDuelArenaLobby()) {
                 this.requestingPlayer.getDuelController().handleDuelRequest(this.targetPlayer);
                 this.requestingPlayer.getUpdateState().setFaceEntity(-1);
@@ -41,6 +42,32 @@ extends TickTask {
             this.requestingPlayer.getMovementQueue().clear();
             this.stop();
         }
+    }
+
+    private boolean isValidDuelRequestTask() {
+        return this.requestingPlayer != null && this.targetPlayer != null && !this.requestingPlayer.isDead() && !this.targetPlayer.isDead() && this.requestingPlayer.isRegistered() && this.targetPlayer.isRegistered() && this.requestingPlayer.isCurrentActionSequence(this.actionSequence);
+    }
+
+    private boolean canCompleteDuelRequest() {
+        if (!this.requestingPlayer.isInDuelArenaLobby() || !this.targetPlayer.isInDuelArenaLobby() || this.requestingPlayer.isInDuelArena() || this.targetPlayer.isInDuelArena()) {
+            return false;
+        }
+        if (this.requestingPlayer.getOpenInterfaceId() > 0 || this.targetPlayer.getOpenInterfaceId() > 0) {
+            return false;
+        }
+        if (this.requestingPlayer.getDuelSession().getOpponent() != null || this.targetPlayer.getDuelSession().getOpponent() != null) {
+            return false;
+        }
+        return !this.requestingPlayer.getDuelSession().isStarted() && !this.targetPlayer.getDuelSession().isStarted();
+    }
+
+    private void clearRequestState() {
+        if (this.requestingPlayer != null) {
+            EntityTargetMovement.clearMovementTarget(this.requestingPlayer);
+            this.requestingPlayer.setInteractionTarget(null);
+            this.requestingPlayer.getMovementQueue().clear();
+        }
+        this.stop();
     }
 }
 

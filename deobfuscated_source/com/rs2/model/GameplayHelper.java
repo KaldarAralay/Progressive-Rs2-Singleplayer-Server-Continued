@@ -115,6 +115,10 @@ public class GameplayHelper {
             if (player.botCombatTickTask != null && player.botCombatTickTask.isActive()) {
                 player.botCombatTickTask.stop();
             }
+            player.botCombatTickTarget = null;
+            if (player.botDuelArenaTask != null && player.botDuelArenaTask.isActive()) {
+                player.botDuelArenaTask.stop();
+            }
             if (player.pendingGroupCleanup != null) {
                 player.pendingGroupCleanup.finishDeferredRemoval(player);
             }
@@ -145,6 +149,10 @@ public class GameplayHelper {
         }
         if (player.botCombatTickTask != null && player.botCombatTickTask.isActive()) {
             player.botCombatTickTask.stop();
+        }
+        player.botCombatTickTarget = null;
+        if (player.botDuelArenaTask != null && player.botDuelArenaTask.isActive()) {
+            player.botDuelArenaTask.stop();
         }
         if (player.pendingGroupCleanup != null) {
             player.pendingGroupCleanup.finishDeferredRemoval(player);
@@ -453,6 +461,10 @@ public class GameplayHelper {
         }
         if (selectedTask == null) {
             selectedTask = availableTasks.size() > 0 ? (BotTaskDefinition)availableTasks.get(0) : currentTask;
+        }
+        if (selectedTask == null) {
+            System.out.println("No bot task available for: " + player.getUsername());
+            return;
         }
         if (player.currentBotTask != null) {
             player.currentBotTask.assignedBotPlayers.remove(player);

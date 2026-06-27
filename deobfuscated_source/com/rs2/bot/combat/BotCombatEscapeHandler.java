@@ -5,6 +5,7 @@ package com.rs2.bot.combat;
 
 import com.rs2.bot.combat.BotCombatEscapeLogoutTask;
 import com.rs2.bot.combat.BotCombatHelper;
+import com.rs2.bot.tasks.DuelArenaBotTask;
 import com.rs2.model.Entity;
 import com.rs2.model.Position;
 import com.rs2.model.World;
@@ -34,6 +35,15 @@ public final class BotCombatEscapeHandler {
     private static Position[] runeRockEscapeWaypoints = new Position[]{new Position(3042, 3880, 0), new Position(3027, 3869, 0), new Position(3012, 3863, 0), new Position(3005, 3849, 0)};
 
     public static boolean tryStartBotCombatEscape(Player player) {
+        if (player == null) {
+            return false;
+        }
+        if (player.botMode == 7 || player.currentBotTask instanceof DuelArenaBotTask || player.isInDuelArena()) {
+            player.botCombatEscapeActive = false;
+            player.botTaskReturnToBankRequested = false;
+            player.botCombatState = null;
+            return false;
+        }
         if (player.currentBotTask != null && !player.isInWilderness()) {
             player.currentBotTask.startWalkToBank(player);
             return true;

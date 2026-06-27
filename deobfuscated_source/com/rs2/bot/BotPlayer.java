@@ -5,6 +5,7 @@ package com.rs2.bot;
 
 import com.rs2.ServerSettings;
 import com.rs2.bot.BotCombatLoadoutTask;
+import com.rs2.bot.BotDuelArenaStartTask;
 import com.rs2.bot.BotTaskPlanningTask;
 import com.rs2.bot.BotTaskSelectionTask;
 import com.rs2.bot.BotTradeAdvertStartTask;
@@ -98,6 +99,11 @@ extends Player {
         }
         ClanWarsBotHideTask clanWarsBotHideTask = new ClanWarsBotHideTask(this, 2, botPlayer);
         World.getTaskScheduler().schedule(clanWarsBotHideTask);
+    }
+
+    public final void startDuelArenaBot() {
+        Object object = this;
+        World.getTaskScheduler().schedule(new BotDuelArenaStartTask(this, 2, (BotPlayer)object));
     }
 
     public static void createBotFromPool(int n, String string, int n2) {
