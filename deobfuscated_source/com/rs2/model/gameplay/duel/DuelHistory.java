@@ -7,13 +7,54 @@ import com.rs2.model.player.Player;
 import java.util.ArrayList;
 
 public final class DuelHistory {
+    private static final int MAX_DISPLAY_RESULTS = 50;
+    private static final int MAX_MATCHUP_RESULTS = 100;
     private static ArrayList recentResults = new ArrayList();
+    private static ArrayList recentWinnerKeys = new ArrayList();
+    private static ArrayList recentLoserKeys = new ArrayList();
 
     public static void recordDuelResult(Player player, Player player2) {
-        if (recentResults.size() >= 50) {
+        if (recentResults.size() >= MAX_DISPLAY_RESULTS) {
             recentResults.remove(0);
         }
         recentResults.add(String.valueOf(player.getUsername()) + " (" + player.getCombatLevel() + ") beat " + player2.getUsername() + " (" + player2.getCombatLevel() + ")");
+        if (recentWinnerKeys.size() >= MAX_MATCHUP_RESULTS) {
+            recentWinnerKeys.remove(0);
+            recentLoserKeys.remove(0);
+        }
+        recentWinnerKeys.add(DuelHistory.getPlayerKey(player));
+        recentLoserKeys.add(DuelHistory.getPlayerKey(player2));
+    }
+
+    public static int countRecentLossesTo(Player loser, Player winner) {
+        String loserKey = DuelHistory.getPlayerKey(loser);
+        String winnerKey = DuelHistory.getPlayerKey(winner);
+        int count = 0;
+        int index = 0;
+        while (index < recentWinnerKeys.size()) {
+            if (winnerKey.equals(recentWinnerKeys.get(index)) && loserKey.equals(recentLoserKeys.get(index))) {
+                ++count;
+            }
+            ++index;
+        }
+        return count;
+    }
+
+    public static boolean shouldAvoidRepeatFarm(Player bot, Player opponent) {
+        if (bot == null || opponent == null) {
+            return false;
+        }
+        return DuelHistory.countRecentLossesTo(bot, opponent) >= 2;
+    }
+
+    private static String getPlayerKey(Player player) {
+        if (player == null) {
+            return "";
+        }
+        if (player.getUsername() == null) {
+            return String.valueOf(player.getIndex());
+        }
+        return player.getUsername().toLowerCase();
     }
 
     public static void openDuelHistoryInterface(Player player) {
@@ -56,4 +97,3 @@ public final class DuelHistory {
         player2.packetSender.showInterface(6308);
     }
 }
-

@@ -35,6 +35,7 @@ extends ArrayList {
         this.add(BotTaskDefinition.getBrimhavenDungeonBlueDragonSouthCombatTask());
         this.add(BotTaskDefinition.getBrimhavenDungeonRedDragonCombatTask());
         this.add(BotTaskDefinition.getTaverleyDungeonHellhoundCombatTask());
+        this.add(BotTaskDefinition.getDuelArenaCombatTask());
     }
 }
 

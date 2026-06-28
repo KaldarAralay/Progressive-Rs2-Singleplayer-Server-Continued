@@ -20,7 +20,7 @@ import java.io.Serializable;
 public final class ConfigFile {
     private String key;
     private int parameterCount;
-    private static ConfigFile[] definitions = new ConfigFile[]{new ConfigFile("LAN", 1), new ConfigFile("MYSQL_HISCORES", 1), new ConfigFile("P2P_WORLD", 1), new ConfigFile("CACHE_VERSION", 1), new ConfigFile("FIGHTCAVE_START_WAVE", 1), new ConfigFile("MEMBERS_REQ", 3), new ConfigFile("XP_RATE", 2), new ConfigFile("QUEST_XP_RATE", 1), new ConfigFile("BOT_XP_RATE", 2), new ConfigFile("BANK_SIZE", 2), new ConfigFile("IDLE_LOGOUT", 1), new ConfigFile("BACKUP_CHARACTERS", 1), new ConfigFile("WC_STYLE_MINING", 1), new ConfigFile("DYNAMIC_SHOP_PRICES", 1), new ConfigFile("SHOP_ITEM_MULTIPLIER", 1), new ConfigFile("SHOP_RESTOCK_TIME_MULTIPLIER", 1), new ConfigFile("ITEM_RESPAWN_DELAY_MULTIPLIER", 1), new ConfigFile("NPC_RESPAWN_DELAY_MULTIPLIER", 1), new ConfigFile("ITEM_DROP_RATES", 5), new ConfigFile("ITEMS_STAY_ON_GROUND_TIME", 1), new ConfigFile("HOLIDAY_ITEM_DROPS", 3), new ConfigFile("DISEASING", 1), new ConfigFile("BARROWS_REWARD_RATE", 1), new ConfigFile("NO_RANDOMS", 1), new ConfigFile("FORCE_RESET_BOTS", 1), new ConfigFile("BOT_ESCAPE_HIGH_LVLS", 1), new ConfigFile("HOTZONES_FOR_WILDYBOTS", 1), new ConfigFile("REMOVED_BOT_NAMES", 1), new ConfigFile("TRADE_BOT_COMMON_ITEM_CHANCE", 1), new ConfigFile("WILDY_BOTS", 6), new ConfigFile("SKILLING_BOTS", 2), new ConfigFile("PROGRESSIVE_BOTS", 3), new ConfigFile("TRADE_BOTS", 2), new ConfigFile("OTHER_BOTS", 1), new ConfigFile("CLANWAR_BOTS", 3), new ConfigFile("DROP_PARTY_CHANCE", 1), new ConfigFile("SCAMMER_CHANCE", 1), new ConfigFile("WALKING_BOTS", 1), new ConfigFile("BOT_LOGIN", 2), new ConfigFile("MOVEMENT_SYSTEM", 1), new ConfigFile("SKIP_REQS_FOR_MISSING_QUESTS", 1), new ConfigFile("RECOLOR_MISSING_QUESTS", 1), new ConfigFile("COMPLETE_MISSING_QUESTS", 1), new ConfigFile("RELOG_FROZEN_BOTS", 1), new ConfigFile("SHOW_SKILL_UNLOCKS", 1), new ConfigFile("MOD_2HS", 3), new ConfigFile("MAX_LVL", 2)};
+    private static ConfigFile[] definitions = new ConfigFile[]{new ConfigFile("LAN", 1), new ConfigFile("MYSQL_HISCORES", 1), new ConfigFile("P2P_WORLD", 1), new ConfigFile("CACHE_VERSION", 1), new ConfigFile("FIGHTCAVE_START_WAVE", 1), new ConfigFile("MEMBERS_REQ", 3), new ConfigFile("XP_RATE", 2), new ConfigFile("QUEST_XP_RATE", 1), new ConfigFile("BOT_XP_RATE", 2), new ConfigFile("BANK_SIZE", 2), new ConfigFile("IDLE_LOGOUT", 1), new ConfigFile("BACKUP_CHARACTERS", 1), new ConfigFile("WC_STYLE_MINING", 1), new ConfigFile("DYNAMIC_SHOP_PRICES", 1), new ConfigFile("SHOP_ITEM_MULTIPLIER", 1), new ConfigFile("SHOP_RESTOCK_TIME_MULTIPLIER", 1), new ConfigFile("ITEM_RESPAWN_DELAY_MULTIPLIER", 1), new ConfigFile("NPC_RESPAWN_DELAY_MULTIPLIER", 1), new ConfigFile("ITEM_DROP_RATES", 5), new ConfigFile("ITEMS_STAY_ON_GROUND_TIME", 1), new ConfigFile("HOLIDAY_ITEM_DROPS", 3), new ConfigFile("DISEASING", 1), new ConfigFile("BARROWS_REWARD_RATE", 1), new ConfigFile("NO_RANDOMS", 1), new ConfigFile("FORCE_RESET_BOTS", 1), new ConfigFile("BOT_ESCAPE_HIGH_LVLS", 1), new ConfigFile("HOTZONES_FOR_WILDYBOTS", 1), new ConfigFile("REMOVED_BOT_NAMES", 1), new ConfigFile("TRADE_BOT_COMMON_ITEM_CHANCE", 1), new ConfigFile("WILDY_BOTS", 6), new ConfigFile("SKILLING_BOTS", 2), new ConfigFile("PROGRESSIVE_BOTS", 3), new ConfigFile("TRADE_BOTS", 2), new ConfigFile("DUEL_BOTS", 2), new ConfigFile("OTHER_BOTS", 1), new ConfigFile("CLANWAR_BOTS", 3), new ConfigFile("DROP_PARTY_CHANCE", 1), new ConfigFile("SCAMMER_CHANCE", 1), new ConfigFile("WALKING_BOTS", 1), new ConfigFile("BOT_LOGIN", 2), new ConfigFile("MOVEMENT_SYSTEM", 1), new ConfigFile("SKIP_REQS_FOR_MISSING_QUESTS", 1), new ConfigFile("RECOLOR_MISSING_QUESTS", 1), new ConfigFile("COMPLETE_MISSING_QUESTS", 1), new ConfigFile("RELOG_FROZEN_BOTS", 1), new ConfigFile("SHOW_SKILL_UNLOCKS", 1), new ConfigFile("MOD_2HS", 3), new ConfigFile("MAX_LVL", 2)};
 
     private ConfigFile(String string, int n) {
         this.key = string;
@@ -82,6 +82,9 @@ public final class ConfigFile {
                     } else if (((String)object).equals("TRADE_BOTS")) {
                         ServerSettings.tradeBotsEnabled = Integer.parseInt(stringArray[0]) == 1;
                         ServerSettings.tradeBotCount = Integer.parseInt(stringArray[1]);
+                    } else if (((String)object).equals("DUEL_BOTS")) {
+                        ServerSettings.duelBotsEnabled = Integer.parseInt(stringArray[0]) == 1;
+                        ServerSettings.duelBotCount = Integer.parseInt(stringArray[1]);
                     } else if (((String)object).equals("OTHER_BOTS")) {
                         ServerSettings.otherBotsEnabled = Integer.parseInt(stringArray[0]) == 1;
                     } else if (((String)object).equals("CLANWAR_BOTS")) {
@@ -327,6 +330,12 @@ public final class ConfigFile {
                     ConfigFile.writeConfigLine(bufferedWriter, "//# = amount of bots");
                     ConfigFile.writeConfigLine(bufferedWriter, "");
                     ConfigFile.writeConfigLine(bufferedWriter, "[TRADE_BOTS];1;50");
+                    ConfigFile.writeConfigLine(bufferedWriter, "");
+                    ConfigFile.writeConfigLine(bufferedWriter, "//DUEL_BOTS - Parameters for customization:");
+                    ConfigFile.writeConfigLine(bufferedWriter, "//1 = enable, 0 = disable");
+                    ConfigFile.writeConfigLine(bufferedWriter, "//# = amount of bots");
+                    ConfigFile.writeConfigLine(bufferedWriter, "");
+                    ConfigFile.writeConfigLine(bufferedWriter, "[DUEL_BOTS];1;20");
                     ConfigFile.writeConfigLine(bufferedWriter, "");
                     ConfigFile.writeConfigLine(bufferedWriter, "//OTHER_BOTS - Parameters for customization:");
                     ConfigFile.writeConfigLine(bufferedWriter, "//1 = enable, 0 = disable");

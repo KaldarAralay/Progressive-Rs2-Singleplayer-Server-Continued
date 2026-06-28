@@ -2815,7 +2815,7 @@ public final class CharacterFileManager {
                     }
                     catch (IOException iOException) {
                         IOException iOException2 = iOException;
-                        iOException.printStackTrace();
+                        throw iOException;
                     }
                     try {
                         ((DataInputStream)object2).readInt();
@@ -2824,28 +2824,28 @@ public final class CharacterFileManager {
                     }
                     catch (IOException iOException) {
                         IOException iOException3 = iOException;
-                        iOException.printStackTrace();
+                        throw iOException;
                     }
                     try {
                         ((DataInputStream)object2).readBoolean();
                     }
                     catch (IOException iOException) {
                         IOException iOException4 = iOException;
-                        iOException.printStackTrace();
+                        throw iOException;
                     }
                     try {
                         ((DataInputStream)object2).readBoolean();
                     }
                     catch (IOException iOException) {
                         IOException iOException5 = iOException;
-                        iOException.printStackTrace();
+                        throw iOException;
                     }
                     try {
                         ((DataInputStream)object2).readBoolean();
                     }
                     catch (IOException iOException) {
                         IOException iOException6 = iOException;
-                        iOException.printStackTrace();
+                        throw iOException;
                     }
                     int n6 = 0;
                     while (n6 < musicUnlockConfigIds.length) {
@@ -2854,7 +2854,7 @@ public final class CharacterFileManager {
                         }
                         catch (IOException iOException) {
                             IOException iOException7 = iOException;
-                            iOException.printStackTrace();
+                            throw iOException;
                         }
                         ++n6;
                     }
@@ -2865,7 +2865,7 @@ public final class CharacterFileManager {
                         }
                         catch (IOException iOException) {
                             IOException iOException8 = iOException;
-                            iOException.printStackTrace();
+                            throw iOException;
                         }
                         ++n6;
                     }
@@ -2900,7 +2900,7 @@ public final class CharacterFileManager {
                             }
                             catch (IOException iOException) {
                                 IOException iOException9 = iOException;
-                                iOException.printStackTrace();
+                                throw iOException;
                             }
                             ++n6;
                         }
@@ -2911,7 +2911,7 @@ public final class CharacterFileManager {
                             }
                             catch (IOException iOException) {
                                 IOException iOException10 = iOException;
-                                iOException.printStackTrace();
+                                throw iOException;
                             }
                             ++n6;
                         }
@@ -3127,7 +3127,7 @@ public final class CharacterFileManager {
                 }
                 catch (Exception exception) {
                     Exception exception2 = exception;
-                    exception.printStackTrace();
+                    System.out.println("Invalid character file: " + username + " (" + exception.getClass().getSimpleName() + ")");
                     ((FilterInputStream)object2).close();
                     ((FileInputStream)object).close();
                     return false;
@@ -3139,7 +3139,7 @@ public final class CharacterFileManager {
         }
         catch (IOException iOException) {
             object = iOException;
-            iOException.printStackTrace();
+            System.out.println("Invalid character file: " + username + " (" + iOException.getClass().getSimpleName() + ")");
             return false;
         }
     }
@@ -4150,13 +4150,22 @@ public final class CharacterFileManager {
             }
             return;
         }
-        if (!CharacterFileManager.validateCharacterFile(path, player.getUsername()) && path.equals("./data/characters/")) {
-            CharacterFileManager.restorePlayerFromBackup(player);
+        if (!CharacterFileManager.validateCharacterFile(path, player.getUsername())) {
+            if (player.isBot) {
+                CharacterFileManager.resetInvalidBotCharacterFile(file, player);
+                return;
+            }
+            if (path.equals("./data/characters/")) {
+                CharacterFileManager.restorePlayerFromBackup(player);
+            }
             return;
         }
         CharacterFileRecord record = CharacterFileManager.readCharacterFileRecord(path, player.getUsername(), true);
         if (record == null) {
             System.out.println("Account not loading: " + player);
+            if (player.isBot) {
+                CharacterFileManager.resetInvalidBotCharacterFile(file, player);
+            }
             return;
         }
         CharacterFileManager.applyCharacterFileRecordToPlayer(record, player);
@@ -4164,6 +4173,20 @@ public final class CharacterFileManager {
         if (!path.equals("./data/characters/")) {
             player.dQ = true;
             GameplayHelper.appendLogLine(String.valueOf(System.currentTimeMillis()) + "\u00a7" + player.getUsername() + "\u00a7" + player.lastSavedMillis, "restored");
+        }
+        if (Server.getInstance() != null) {
+            Server.getInstance().queueLogin(player);
+        }
+    }
+
+    private static void resetInvalidBotCharacterFile(File file, Player player) {
+        System.out.println("Resetting invalid bot character file: " + player.getUsername());
+        File invalidFile = new File(String.valueOf(file.getPath()) + ".invalid");
+        if (invalidFile.exists()) {
+            invalidFile.delete();
+        }
+        if (!file.renameTo(invalidFile)) {
+            file.delete();
         }
         if (Server.getInstance() != null) {
             Server.getInstance().queueLogin(player);

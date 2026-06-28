@@ -73,6 +73,10 @@ public final class BotTaskPlanner {
             ((ArrayList)object).addAll(BotTaskDefinition.woodcuttingTasks);
             ((ArrayList)object).add((BotTaskDefinition)BotTaskDefinition.runecraftingTasks.get(0));
             BotTaskDefinition botTaskDefinition = GameplayHelper.selectAvailableBotTask(player, (ArrayList)object, false);
+            if (botTaskDefinition == null) {
+                System.out.println("No initial progressive bot task available for: " + player.getUsername());
+                return;
+            }
             object = player;
             player.currentBotTask = botTaskDefinition;
             BotTaskPlanner.configureCurrentBotTaskGoals(player);
@@ -151,6 +155,10 @@ public final class BotTaskPlanner {
         Player player2 = player;
         BotTaskDefinition botTaskDefinition = player2.currentBotTask;
         BotTaskPlanner.resetBotTaskGoals(player2);
+        if (botTaskDefinition == null) {
+            player2.botTaskRequiredItems = null;
+            return;
+        }
         if (!BotTaskDefinition.shopTasks.contains(botTaskDefinition)) {
             player2.botTaskRequiredItems = null;
             Player player3 = player2;

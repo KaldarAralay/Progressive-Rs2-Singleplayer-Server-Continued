@@ -17,6 +17,7 @@ import com.rs2.bot.combat.BotCombatLoadoutTables;
 import com.rs2.bot.route.BotWorldRoute;
 import com.rs2.bot.route.BotWorldRouteChoice;
 import com.rs2.bot.route.BotWorldRouteWalker;
+import com.rs2.bot.tasks.DuelArenaBotTask;
 import com.rs2.cache.CacheArchiveEntry;
 import com.rs2.cache.CacheDefinitionIndex;
 import com.rs2.cache.InterfaceDefinition;
@@ -566,6 +567,8 @@ extends Entity {
     public String botCombatState;
     public TickTask botEscapeLogoutTask;
     public TickTask botCombatTickTask;
+    public Player botCombatTickTarget;
+    public TickTask botDuelArenaTask;
     public int botMagicGearSwapDelayTicks;
     public int botThreatEscapeDelayTicks;
     public int botPrayerSwitchDelayTicks;
@@ -748,6 +751,13 @@ extends Entity {
     }
 
     private boolean recoverBotTaskStall(boolean bl) {
+        if (this.currentBotTask == null) {
+            this.recoverMissingCurrentBotTask("stall recovery");
+            return false;
+        }
+        if (this.shouldSkipGenericBotRecoveryForDuel()) {
+            return false;
+        }
         if (bl) {
             Player player = this;
             System.out.println("Detected possibly frozen bot: " + player.username + " at: " + this.getPosition() + ", trying to apply fix.");
@@ -777,6 +787,27 @@ extends Entity {
         return false;
     }
 
+    private boolean recoverMissingCurrentBotTask(String string) {
+        if (this.currentBotTask != null) {
+            return false;
+        }
+        Player player = this;
+        System.out.println("Reseting " + player.username + " to lumbridge and picking new task");
+        System.out.println("Missing bot task while " + string + " at: " + this.getPosition());
+        if (!this.isBot) {
+            player = this;
+            player.packetSender.sendGameMessage("You didn't have a bot task to continue.");
+            player = this;
+            player.packetSender.sendGameMessage("You have been reset to Lumbridge and given new task.");
+        }
+        this.resetBotToLumbridge();
+        return true;
+    }
+
+    private boolean shouldSkipGenericBotRecoveryForDuel() {
+        return this.isBot && (this.botMode == 7 || this.currentBotTask instanceof DuelArenaBotTask || this.getDuelSession().getOpponent() != null || this.getDuelSession().isStarted() || this.isInDuelArena());
+    }
+
     private void resetBotToLumbridge() {
         this.botLumbridgeResetPending = true;
         Object object = this;
@@ -787,6 +818,9 @@ extends Entity {
     }
 
     public final boolean hasBotStalled() {
+        if (this.shouldSkipGenericBotRecoveryForDuel()) {
+            return false;
+        }
         int n = this.getPosition().getX();
         int n2 = this.getPosition().getY();
         int n3 = this.getPosition().getPlane();
@@ -830,15 +864,21 @@ extends Entity {
             this.deferredBotTask = BotTaskDefinition.getTaskByTypeAndIndex(this.deferredBotTaskTypeId, this.deferredBotTaskIndex);
         }
         if (this.currentBotTask == null) {
+            this.recoverMissingCurrentBotTask("resume");
+            return;
+        }
+        if (this.currentBotTask instanceof DuelArenaBotTask && this.botMode != 7) {
             player = this;
-            System.out.println("Reseting " + player.username + " to lumbridge and picking new task");
-            if (!this.isBot) {
-                player = this;
-                player.packetSender.sendGameMessage("You didn't have a bot task to continue.");
-                player = this;
-                player.packetSender.sendGameMessage("You have been reset to Lumbridge and given new task.");
-            }
-            this.resetBotToLumbridge();
+            System.out.println("Clearing non-duel bot from duel arena task: " + player.username);
+            this.currentBotTask.assignedBotPlayers.remove(this);
+            this.currentBotTask = null;
+            this.currentBotTaskTypeId = -1;
+            this.currentBotTaskIndex = -1;
+            this.deferredBotTask = null;
+            this.deferredBotTaskTypeId = -1;
+            this.deferredBotTaskIndex = -1;
+            this.botTaskState = "wait for new task";
+            GameplayHelper.startNextBotTask(this);
             return;
         }
         if (this.currentBotTask.taskRouteSegments != null && this.botPathSegmentIndex > this.currentBotTask.taskRouteSegments.length - 1) {
@@ -873,6 +913,9 @@ extends Entity {
         }
         if (this.currentBotTaskTypeId == 5 && (this.botTaskRequiredItems == null || this.botTaskRequiredItems.length == 0) && this.botTaskItemId > 0) {
             SmeltingHandler.prepareBotSmeltingRequirements(this, this.botTaskItemId);
+        }
+        if (this.recoverMissingCurrentBotTask("resume " + this.botTaskState)) {
+            return;
         }
         if (this.botTaskState.equals("do task") && this.currentBotTaskTypeId != 14) {
             int n2 = GameUtil.getDistance(this.getPosition(), this.currentBotTask.getTaskPosition());
@@ -1586,6 +1629,7 @@ extends Entity {
         this.botFoodItemId = 0;
         this.botWildernessMaxY = 0;
         this.botCombatState = null;
+        this.botCombatTickTarget = null;
         this.botMagicGearSwapDelayTicks = 0;
         this.botThreatEscapeDelayTicks = 0;
         this.botPrayerSwitchDelayTicks = 0;
@@ -2192,6 +2236,8 @@ extends Entity {
                     botPlayer.startProgressiveBot();
                 } else if (this.botMode == 5 || this.botMode == 6) {
                     botPlayer.startClanWarsBot(this.botMode);
+                } else if (this.botMode == 7) {
+                    botPlayer.startDuelArenaBot();
                 }
             }
         } else if (string.equals("modern")) {
@@ -2453,6 +2499,9 @@ extends Entity {
     }
 
     private void startCurrentBotTaskInteraction() {
+        if (this.recoverMissingCurrentBotTask("start task interaction")) {
+            return;
+        }
         this.botTaskState = "do task";
         this.botInteractionOption = this.currentBotTask.getInteractionOption(this);
         if (!this.dropPartyLeader && !this.currentBotTask.usesCustomTaskAction) {
@@ -2488,6 +2537,9 @@ extends Entity {
         Position position = this.currentBotRoute.waypoints[this.botPathWaypointIndex];
         int n = GameUtil.getDistance(this.getPosition(), position);
         if (n > 50) {
+            if (this.shouldSkipGenericBotRecoveryForDuel()) {
+                return;
+            }
             Player player = this;
             System.out.println("Detected possibly frozen bot: " + player.username + " at: " + this.getPosition() + ", trying to apply fix.");
             this.moveTo(position);
@@ -2522,6 +2574,9 @@ extends Entity {
             if (this.botPathWaypointIndex == this.currentBotRoute.waypoints.length) {
                 this.currentBotRoute = null;
                 this.botPathWaypointIndex = 0;
+                if (this.recoverMissingCurrentBotTask("route completion " + this.botTaskState)) {
+                    return;
+                }
                 if (this.botTaskState.equals("walk to task")) {
                     this.startCurrentBotTaskInteraction();
                     return;

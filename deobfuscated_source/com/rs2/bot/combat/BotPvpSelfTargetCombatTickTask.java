@@ -24,14 +24,17 @@ extends TickTask {
         if (this.target.isDead() || !this.target.isRegistered()) {
             BotCombatHelper.stopBotCombatTick(this.bot);
             this.stop();
+            return;
         }
         if (this.bot.isDead() || !this.bot.isRegistered()) {
             BotCombatHelper.stopBotCombatTick(this.bot);
             this.stop();
+            return;
         }
         if (this.bot.getCombatTarget() == null) {
             BotCombatHelper.stopBotCombatTick(this.bot);
             this.stop();
+            return;
         }
         BotPvpCombatHandler.processBotPvpCombatTick(this.bot, this.target);
     }

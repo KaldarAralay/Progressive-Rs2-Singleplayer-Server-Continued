@@ -52,6 +52,7 @@ import com.rs2.bot.tasks.DraynorYewWoodcuttingBotTask;
 import com.rs2.bot.tasks.DwarvenMineBotTask;
 import com.rs2.bot.tasks.DwarvenMineDwarfCombatBotTask;
 import com.rs2.bot.tasks.EarthRuneRunecraftingBotTask;
+import com.rs2.bot.tasks.DuelArenaBotTask;
 import com.rs2.bot.tasks.EdgevilleDungeonHillGiantCombatBotTask;
 import com.rs2.bot.tasks.EdgevilleDungeonNorthMossGiantCombatBotTask;
 import com.rs2.bot.tasks.EdgevilleDungeonSkeletonCombatBotTask;
@@ -193,6 +194,7 @@ public abstract class BotTaskDefinition {
     private static VarrockSouthChickenCombatBotTask varrockSouthChickenCombatTask = new VarrockSouthChickenCombatBotTask(1);
     static WizardsTowerLesserDemonMagicBotTask wizardsTowerLesserDemonMagicTask = new WizardsTowerLesserDemonMagicBotTask(1);
     static FaladorImpCombatBotTask faladorImpCombatTask = new FaladorImpCombatBotTask(1);
+    private static DuelArenaBotTask duelArenaCombatTask = new DuelArenaBotTask(3);
     private static DraynorSheepShearingBotTask draynorSheepShearingTask = new DraynorSheepShearingBotTask(4);
     private static LumbridgeWoolSpinningBotTask lumbridgeWoolSpinningTask = new LumbridgeWoolSpinningBotTask(4);
     private static CatherbyLobsterCookingBotTask catherbyLobsterCookingTask = new CatherbyLobsterCookingBotTask(1);
@@ -1011,6 +1013,10 @@ public abstract class BotTaskDefinition {
 
     static /* synthetic */ TaverleyDungeonHellhoundCombatBotTask getTaverleyDungeonHellhoundCombatTask() {
         return taverleyDungeonHellhoundCombatTask;
+    }
+
+    static /* synthetic */ DuelArenaBotTask getDuelArenaCombatTask() {
+        return duelArenaCombatTask;
     }
 }
 

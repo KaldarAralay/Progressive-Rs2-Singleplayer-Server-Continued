@@ -599,6 +599,7 @@ public final class BotCombatHelper {
         if (player.botCombatTickTask != null && player.botCombatTickTask.isActive()) {
             player.botCombatTickTask.stop();
         }
+        player.botCombatTickTarget = null;
         player.getMovementQueue().setRunning(false);
         player.getPrayerManager().deactivateAll();
     }

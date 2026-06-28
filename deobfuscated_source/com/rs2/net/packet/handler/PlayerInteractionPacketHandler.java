@@ -79,6 +79,20 @@ implements PacketHandler {
                 player.setQueuedCombatSpell(null);
                 player.getUpdateState().setFaceEntity(targetPlayer.getEncodedIndex());
                 if (!player.isInDuelArena() && !player.isInWilderness()) {
+                    if (player.isInDuelArenaLobby()) {
+                        if (!targetPlayer.isInDuelArenaLobby()) {
+                            return;
+                        }
+                        if (targetPlayer.getOpenInterfaceId() > 0) {
+                            player.packetSender.sendGameMessage("This player is busy.");
+                            return;
+                        }
+                        player.setInteractionTarget(targetPlayer);
+                        player.setAttackRange(1);
+                        player.setMovementTarget(targetPlayer);
+                        World.scheduleTickTask(new DuelRequestTask(this, 1, targetPlayer, player, actionSequence));
+                        return;
+                    }
                     if (ServerSettings.duelingDisabled) {
                         player.packetSender.sendGameMessage("This feature is currently disabled.");
                         return;
@@ -198,5 +212,44 @@ implements PacketHandler {
         player.setAttackRange(1);
         player.setMovementTarget(player2);
         World.scheduleTickTask(new DeferredTradeRequestTask(1, player2, player, n));
+    }
+
+    public static void dispatchDeferredDuelRequest(Player player, Player player2) {
+        if (player2 == null || !GameUtil.isWithinDistance(player.getPosition(), player2.getPosition(), 15)) {
+            return;
+        }
+        int n = player.nextActionSequence();
+        player.setQueuedCombatSpell(null);
+        player.getUpdateState().setFaceEntity(player2.getEncodedIndex());
+        if (player.isInDuelArena() || player.isInWilderness()) {
+            CombatManager.startCombat(player, player2);
+            return;
+        }
+        if (player.isInDuelArenaLobby()) {
+            if (!player2.isInDuelArenaLobby()) {
+                return;
+            }
+            if (player2.getOpenInterfaceId() > 0) {
+                player.packetSender.sendGameMessage("This player is busy.");
+                return;
+            }
+            player.setInteractionTarget(player2);
+            player.setAttackRange(1);
+            player.setMovementTarget(player2);
+            World.scheduleTickTask(new DuelRequestTask(null, 1, player2, player, n));
+            return;
+        }
+        if (ServerSettings.duelingDisabled) {
+            player.packetSender.sendGameMessage("This feature is currently disabled.");
+            return;
+        }
+        if (player2.getOpenInterfaceId() > 0) {
+            player.packetSender.sendGameMessage("This player is busy.");
+            return;
+        }
+        player.setInteractionTarget(player2);
+        player.setAttackRange(1);
+        player.setMovementTarget(player2);
+        World.scheduleTickTask(new DuelRequestTask(null, 1, player2, player, n));
     }
 }

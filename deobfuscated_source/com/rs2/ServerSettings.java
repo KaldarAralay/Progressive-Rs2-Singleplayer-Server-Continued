@@ -77,6 +77,7 @@ public final class ServerSettings {
     public static boolean skillingBotsEnabled = false;
     public static boolean tradeBotsEnabled = false;
     public static boolean otherBotsEnabled = false;
+    public static boolean duelBotsEnabled = false;
     public static boolean progressiveBotsEnabled = false;
     public static boolean wcStyleMiningEnabled = false;
     public static boolean ar = false;
@@ -88,6 +89,7 @@ public final class ServerSettings {
     public static int otherBotCount = 20;
     public static int skillingBotCount = 50;
     public static int tradeBotCount = 50;
+    public static int duelBotCount = 20;
     public static int progressiveBotCount = 10;
     public static boolean freeToPlayWorld = true;
     public static boolean wildernessSlayerEnabled;
@@ -329,4 +331,3 @@ public final class ServerSettings {
         APPEARANCE_BODY_PART_RANGES = nArrayArray;
     }
 }
-

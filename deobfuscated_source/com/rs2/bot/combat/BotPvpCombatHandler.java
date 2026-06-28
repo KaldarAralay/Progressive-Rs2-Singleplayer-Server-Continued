@@ -8,6 +8,7 @@ import com.rs2.bot.combat.BotCombatHelper;
 import com.rs2.bot.combat.BotPvpOpponentTargetCombatTickTask;
 import com.rs2.bot.combat.BotPvpSelfTargetCombatTickTask;
 import com.rs2.bot.combat.WildernessBotSettings;
+import com.rs2.bot.tasks.DuelArenaBotTask;
 import com.rs2.cache.InterfaceDefinition;
 import com.rs2.model.World;
 import com.rs2.model.combat.CombatManager;
@@ -28,28 +29,61 @@ public final class BotPvpCombatHandler {
     public static int MAGIC_COMBAT_STYLE = 2;
 
     public static void startBotPvpCombatTicks(Player player, Player player2) {
-        boolean bl;
-        boolean bl2;
+        BotPvpCombatHandler.startBotPvpCombatTick(player, player2, true);
+        BotPvpCombatHandler.startBotPvpCombatTick(player2, player, false);
+    }
+
+    private static void startBotPvpCombatTick(Player player, Player target, boolean selfTargetTask) {
+        if (player == null || target == null) {
+            return;
+        }
         if (player.botEnabled) {
-            bl2 = player.botCombatTickTask != null && player.botCombatTickTask.isActive();
-            boolean bl3 = bl = player.botEscapeLogoutTask != null && player.botEscapeLogoutTask.isActive();
-            if (!bl2 && !bl) {
-                player.botCombatTickTask = new BotPvpSelfTargetCombatTickTask(1, player2, player);
+            BotPvpCombatHandler.clearDuelArenaEscapeState(player);
+            boolean activeCombatTick = player.botCombatTickTask != null && player.botCombatTickTask.isActive();
+            if (activeCombatTick && player.botCombatTickTarget != target) {
+                player.botCombatTickTask.stop();
+                player.botCombatTickTask = null;
+                player.botCombatTickTarget = null;
+                activeCombatTick = false;
+            }
+            boolean activeEscapeTick = player.botEscapeLogoutTask != null && player.botEscapeLogoutTask.isActive();
+            if (activeEscapeTick && BotPvpCombatHandler.isDuelArenaBot(player)) {
+                player.botEscapeLogoutTask.stop();
+                activeEscapeTick = false;
+            }
+            if (!activeCombatTick && !activeEscapeTick) {
+                player.botCombatTickTarget = target;
+                player.botCombatTickTask = selfTargetTask ? new BotPvpSelfTargetCombatTickTask(1, target, player) : new BotPvpOpponentTargetCombatTickTask(1, target, player);
                 World.getTaskScheduler().schedule(player.botCombatTickTask);
             }
         }
-        if (player2.botEnabled) {
-            bl2 = player2.botCombatTickTask != null && player2.botCombatTickTask.isActive();
-            boolean bl4 = bl = player2.botEscapeLogoutTask != null && player2.botEscapeLogoutTask.isActive();
-            if (!bl2 && !bl) {
-                player2.botCombatTickTask = new BotPvpOpponentTargetCombatTickTask(1, player, player2);
-                World.getTaskScheduler().schedule(player2.botCombatTickTask);
-            }
+    }
+
+    private static boolean isDuelArenaBot(Player player) {
+        return player != null && (player.botMode == 7 || player.currentBotTask instanceof DuelArenaBotTask || player.isInDuelArena());
+    }
+
+    private static void clearDuelArenaEscapeState(Player player) {
+        if (!BotPvpCombatHandler.isDuelArenaBot(player)) {
+            return;
+        }
+        if (player.botEscapeLogoutTask != null && player.botEscapeLogoutTask.isActive()) {
+            player.botEscapeLogoutTask.stop();
+        }
+        player.botCombatEscapeActive = false;
+        player.botTaskReturnToBankRequested = false;
+        if (player.botCombatState != null) {
+            player.botCombatState = null;
         }
     }
 
     static /* synthetic */ void processBotPvpCombatTick(Player player, Player player2) {
         int n;
+        if (BotPvpCombatHandler.isDuelArenaBot(player) && player.botCombatState != null) {
+            player.botCombatState = null;
+            player.botCombatEscapeActive = false;
+            player.botTaskReturnToBankRequested = false;
+        }
         if (player.botCombatState != null && player.botEnabled && player.botCombatState.equals("escape")) {
             BotCombatEscapeHandler.tryStartBotCombatEscape(player);
             return;
@@ -100,7 +134,7 @@ public final class BotPvpCombatHandler {
             CombatManager.startCombat(player, player2);
         }
         int n3 = BotCombatHelper.getEscapeCombatLevelMargin(player);
-        if (WildernessBotSettings.escapeHighLevelAttackersEnabled && !player.clanWarsBot && player2.getCombatLevel() > player.getCombatLevel() + n3 && player.getCombatTarget() == player2) {
+        if (WildernessBotSettings.escapeHighLevelAttackersEnabled && !BotPvpCombatHandler.isDuelArenaBot(player) && !player.clanWarsBot && player2.getCombatLevel() > player.getCombatLevel() + n3 && player.getCombatTarget() == player2) {
             if (player.botThreatEscapeDelayTicks < 3) {
                 ++player.botThreatEscapeDelayTicks;
             } else {
@@ -192,6 +226,11 @@ public final class BotPvpCombatHandler {
                 n7 = 0;
             }
             if (!BotCombatHelper.eatBotFood(player) || player.getInventoryManager().getItemAmount(player.botFoodItemId) <= n7) {
+                if (BotPvpCombatHandler.isDuelArenaBot(player)) {
+                    player.botFoodDepleted = true;
+                    CombatManager.startCombat(player, player2);
+                    return;
+                }
                 BotCombatEscapeHandler.tryStartBotCombatEscape(player);
                 return;
             }
@@ -207,10 +246,14 @@ public final class BotPvpCombatHandler {
             n3 = ItemDefinition.forId(n9).isStackable() ? 1 : 0;
         }
         if (n3 != 0 && player.getEquipmentManager().getContainer().getItemAmount(n9) <= 2) {
+            if (BotPvpCombatHandler.isDuelArenaBot(player)) {
+                CombatManager.startCombat(player, player2);
+                return;
+            }
             BotCombatEscapeHandler.tryStartBotCombatEscape(player);
             return;
         }
-        if (player.getEquipmentManager().getItemIdAtSlot(13) != 0 || n3 != 0) {
+        if (!BotPvpCombatHandler.isDuelArenaBot(player) && (player.getEquipmentManager().getItemIdAtSlot(13) != 0 || n3 != 0)) {
             n3 = n3 != 0 ? 3 : 13;
             GroundItemManager.getInstance();
             Object object = GroundItemManager.findVisibleItem(player, player.getEquipmentManager().getItemIdAtSlot(n3), player2.getPosition());
@@ -248,4 +291,3 @@ public final class BotPvpCombatHandler {
         }
     }
 }
-
