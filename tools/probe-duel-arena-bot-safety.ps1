@@ -111,6 +111,11 @@ Assert-Contains "duel bot stake acceptance uses risk profile" $botTick "DuelAren
 Assert-Contains "duel history records matchup winners" $duelHistory "recentWinnerKeys"
 Assert-Contains "duel history counts repeat losses" $duelHistory "countRecentLossesTo(Player loser, Player winner)"
 Assert-Contains "duel history lets bots avoid repeat farming" $duelHistory "shouldAvoidRepeatFarm(Player bot, Player opponent)"
+Assert-Contains "duel history keeps human anti-farm strict" $duelHistory "HUMAN_REPEAT_LOSS_LIMIT = 2"
+Assert-Contains "duel history has separate bot-vs-bot repeat limit" $duelHistory "BOT_REPEAT_LOSS_LIMIT = 4"
+Assert-Contains "duel history limits bot-vs-bot memory window" $duelHistory "BOT_MATCHUP_RECENT_WINDOW = 24"
+Assert-Contains "duel history requires lopsided bot-vs-bot record" $duelHistory "recentLosses >= recentWins + BOT_REPEAT_LOSS_SPREAD"
+Assert-Contains "duel history identifies duel arena bots without task dependency" $duelHistory "player.botEnabled && player.botMode == 7"
 Assert-Contains "server settings exposes duel bot enable flag" $serverSettings "public static boolean duelBotsEnabled"
 Assert-Contains "server settings exposes duel bot count" $serverSettings "public static int duelBotCount"
 Assert-Contains "config accepts duel bot count" $configFile 'new ConfigFile("DUEL_BOTS", 2)'
@@ -171,5 +176,5 @@ Assert-NotRegex "duel bot tick should not fall through to random next task" $bot
 [pscustomobject]@{
     Probe = "duel-arena-bot-safety"
     Status = "passed"
-    Checked = 117
+    Checked = 122
 }
