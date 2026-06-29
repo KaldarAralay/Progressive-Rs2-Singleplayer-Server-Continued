@@ -5,6 +5,7 @@ package com.rs2.model.interaction;
 
 import com.rs2.model.Position;
 import com.rs2.model.combat.AttackStyleDefinition;
+import com.rs2.model.gameplay.LumbridgeCastleCellarHandler;
 import com.rs2.model.interaction.InteractionDispatcher;
 import com.rs2.model.objects.ObjectDefinition;
 import com.rs2.model.objects.ObjectManager;
@@ -64,6 +65,10 @@ extends TickTask {
             this.player.getUpdateState().setFacePosition(position.centerForSize(((ObjectDefinition)object2).getMaxDimension()));
         }
         if (this.player.getQuestManager().handleThirdObjectAction(this.objectId, this.objectX, this.objectY)) {
+            this.stop();
+            return;
+        }
+        if (LumbridgeCastleCellarHandler.handleThirdObjectAction(this.player, this.objectId, this.objectX, this.objectY, this.objectPlane)) {
             this.stop();
             return;
         }

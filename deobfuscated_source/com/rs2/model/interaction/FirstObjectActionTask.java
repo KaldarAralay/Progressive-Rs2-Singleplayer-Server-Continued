@@ -14,6 +14,7 @@ import com.rs2.model.Position;
 import com.rs2.model.World;
 import com.rs2.model.combat.AttackStyleDefinition;
 import com.rs2.model.dialogue.DialogueManager;
+import com.rs2.model.gameplay.LumbridgeCastleCellarHandler;
 import com.rs2.model.gameplay.abyss.AbyssManager;
 import com.rs2.model.gameplay.barrows.BarrowsManager;
 import com.rs2.model.gameplay.duel.DuelHistory;
@@ -203,6 +204,10 @@ extends TickTask {
             return;
         }
         if (this.player.getQuestManager().handleFirstObjectAction(this.objectId, this.objectX, this.objectY)) {
+            this.stop();
+            return;
+        }
+        if (LumbridgeCastleCellarHandler.handleFirstObjectAction(this.player, this.objectId, this.objectX, this.objectY, this.objectPlane)) {
             this.stop();
             return;
         }

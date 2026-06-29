@@ -4,6 +4,7 @@
 package com.rs2.model.interaction;
 
 import com.rs2.model.Position;
+import com.rs2.model.gameplay.LumbridgeCastleCellarHandler;
 import com.rs2.model.interaction.InteractionDispatcher;
 import com.rs2.model.objects.ObjectDefinition;
 import com.rs2.model.objects.WorldObject;
@@ -56,6 +57,10 @@ extends TickTask {
         object = new Position(this.player.getInteractionTargetX(), this.player.getInteractionTargetY(), this.objectPlane);
         if (objectDefinition != null) {
             this.player.getUpdateState().setFacePosition(((Position)object).centerForSize(objectDefinition.getMaxDimension()));
+        }
+        if (LumbridgeCastleCellarHandler.handleFourthObjectAction(this.player, this.objectId, this.objectX, this.objectY, this.objectPlane)) {
+            this.stop();
+            return;
         }
         int n = this.objectY;
         int n2 = this.objectX;
